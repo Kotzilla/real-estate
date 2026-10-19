@@ -746,10 +746,10 @@ html[lang="th"] body.site { --display: 'Noto Serif Thai', 'playfair-display', se
 }
 .site-wordmark { display: flex; align-items: center; gap: 0.75rem; color: #ffffff; }
 .site-wordmark-name { font-family: var(--display); font-size: 1.375rem; line-height: 1; }
-.site-wordmark-place { font-size: 0.75rem; line-height: 1; color: #a9b2ad; }
+.site-wordmark-place { font-size: 0.75rem; line-height: 1; color: var(--brand-lime); }
 .site-nav { display: flex; align-items: center; gap: 1.5rem; font-size: 0.875rem; }
 .site-nav a, .site-nav button { color: #c9cfcb; transition: color .15s; }
-.site-nav a:hover, .site-nav button:hover, .site-nav .is-current { color: #ffffff; }
+.site-nav a:hover, .site-nav button:hover, .site-nav .is-current { color: var(--brand-lime); }
 .site-nav-icon { display: inline-flex; line-height: 1; }
 .site-nav-item { display: inline-flex; align-items: center; gap: .375rem; }
 .site-nav a[lang] { display: inline-flex; align-items: center; gap: .375rem; }
@@ -834,7 +834,7 @@ html[lang="th"] body.site { --display: 'Noto Serif Thai', 'playfair-display', se
 .home-card-footer { display: flex; align-items: flex-end; justify-content: space-between; gap: .75rem; margin-top: auto; padding-top: 0.625rem; }
 .home-card-footer .home-card-price { margin-top: 0; padding-top: 0; }
 .home-card-link { display: inline-flex; flex-shrink: 0; align-items: center; justify-content: center; width: 2.25rem; height: 2.25rem; border-radius: 9999px; border: 1px solid var(--hairline); color: var(--lagoon); font-size: 1.125rem; transition: background .15s, color .15s, border-color .15s; }
-.home-card-link:hover, .home-card.is-active .home-card-link { background: var(--lagoon); border-color: var(--lagoon); color: #ffffff; }
+.home-card-link:hover, .home-card.is-active .home-card-link { background: var(--brand-lime); border-color: var(--brand-lime); color: var(--ink); }
 
 /* A listing's page (listing.blade.php): photos in a grid, then the facts beside a price / contact box that stays put */
 .listing { max-width: 1180px; margin: 0 auto; padding: 1.5rem 1.75rem 4rem; }
@@ -872,9 +872,9 @@ html[lang="th"] body.site { --display: 'Noto Serif Thai', 'playfair-display', se
 .listing-agent { margin-bottom: 1rem; font-weight: 600; }
 .listing-agent small { display: block; font-weight: 400; font-size: 0.8125rem; color: var(--mist); }
 .listing-button { display: flex; align-items: center; justify-content: center; gap: .5rem; padding: .625rem 1rem; border-radius: 6px; background: var(--lagoon); color: #ffffff; font-size: 0.875rem; font-weight: 500; }
-.listing-button:hover { background: #255850; }
+.listing-button:hover { background: var(--brand-lime); color: var(--ink); }
 .listing-button.is-quiet { background: #ffffff; color: var(--ink); border: 1px solid var(--hairline); }
-.listing-button.is-quiet:hover { border-color: var(--ink); }
+.listing-button.is-quiet:hover { border-color: var(--brand-lime); background: var(--brand-lime); }
 
 /* Landing page (home.blade.php): a full-width beach hero, the newest listings three across, area tiles */
 .landing-hero { position: relative; display: flex; align-items: flex-end; min-height: 32rem; padding: 4rem 1.75rem; overflow: hidden; background: var(--ink); color: #ffffff; }
@@ -886,16 +886,16 @@ html[lang="th"] body.site { --display: 'Noto Serif Thai', 'playfair-display', se
 .landing-dots button { width: .625rem; height: .625rem; border-radius: 9999px; background: rgb(255 255 255 / .45); transition: background .2s, width .2s; }
 .landing-dots button.is-on { width: 1.75rem; background: #ffffff; }
 .landing-hero-inner { position: relative; width: 100%; max-width: 1180px; margin: 0 auto; }
-.landing-title { max-width: 40rem; font-family: var(--display); font-size: 3.25rem; line-height: 1.1; font-weight: 400; }
-.landing-lead { max-width: 34rem; margin-top: 1rem; font-size: 1.125rem; color: #e9ece7; }
+.landing-title { max-width: 40rem; font-family: var(--display); font-size: 3.25rem; line-height: 1.1; font-weight: 400; color: #ffd65a; text-shadow: 0 2px 4px rgb(0 0 0 / .45), 0 4px 24px rgb(0 0 0 / .35); }
+.landing-lead { max-width: 34rem; margin-top: 1rem; font-size: 1.125rem; color: #ffffff; text-shadow: 0 1px 3px rgb(0 0 0 / .6), 0 2px 16px rgb(0 0 0 / .4); }
 .landing-actions { display: flex; flex-wrap: wrap; gap: .75rem; margin-top: 2rem; }
 .landing-button { display: inline-flex; align-items: center; gap: .5rem; padding: .875rem 1.25rem; border-radius: 6px; background: #ffffff; color: var(--ink); font-weight: 600; transition: background .15s, color .15s; }
 .landing-button i { color: var(--lagoon); }
 .landing-button small { font-weight: 400; color: var(--mist); }
-.landing-button:hover { background: var(--lagoon); color: #ffffff; }
-.landing-button:hover i, .landing-button:hover small { color: #ffffff; }
-.landing-map-link { display: inline-flex; align-items: center; gap: .375rem; margin-top: 1.25rem; color: #e9ece7; text-decoration: underline; text-underline-offset: 4px; }
-.landing-map-link:hover { color: #ffffff; }
+.landing-button:hover { background: var(--brand-lime); color: var(--ink); }
+.landing-button:hover i, .landing-button:hover small { color: var(--ink); }
+.landing-map-link { display: inline-flex; align-items: center; gap: .375rem; margin-top: 1.25rem; color: #ffffff; text-shadow: 0 1px 3px rgb(0 0 0 / .6); text-decoration: underline; text-underline-offset: 4px; }
+.landing-map-link:hover { color: var(--brand-lime); }
 .landing-section { max-width: 1180px; margin: 0 auto; padding: 3.5rem 1.75rem 0; }
 .landing-section-head { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; }
 .landing-h2 { display: flex; align-items: center; gap: .5rem; font-family: var(--display); font-size: 1.75rem; font-weight: 400; }
@@ -903,11 +903,11 @@ html[lang="th"] body.site { --display: 'Noto Serif Thai', 'playfair-display', se
 .landing-sub { margin-top: .375rem; color: var(--mist); }
 .landing-more { display: inline-flex; align-items: center; gap: .375rem; font-size: 0.875rem; font-weight: 500; color: var(--lagoon); white-space: nowrap; }
 .landing-cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1.5rem; margin-top: 1.5rem; }
-.landing-cards .home-card:hover .home-card-link { background: var(--lagoon); border-color: var(--lagoon); color: #ffffff; }
+.landing-cards .home-card:hover .home-card-link { background: var(--brand-lime); border-color: var(--brand-lime); color: var(--ink); }
 .landing-areas { display: grid; grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr)); gap: .75rem; margin-top: 1.5rem; }
 .landing-area { display: flex; flex-direction: column; gap: .125rem; padding: 1rem 1.125rem; border: 1px solid var(--hairline); border-radius: 8px; background: #ffffff; font-weight: 600; transition: border-color .15s; }
 .landing-area small { font-weight: 400; font-size: 0.8125rem; color: var(--mist); }
-.landing-area:hover { border-color: var(--lagoon); }
+.landing-area:hover { border-color: var(--brand-lime); box-shadow: inset 0 0 0 1px var(--brand-lime); }
 
 /* Who we are / Contact us on the landing page */
 .landing-about { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 3rem; align-items: center; }
@@ -921,7 +921,7 @@ html[lang="th"] body.site { --display: 'Noto Serif Thai', 'playfair-display', se
 .landing-contact-item { display: flex; align-items: flex-start; gap: .75rem; padding: 1rem; border: 1px solid var(--hairline); border-radius: 8px; background: #ffffff; font-size: 0.875rem; font-weight: 500; overflow-wrap: anywhere; transition: border-color .15s; }
 .landing-contact-item i { flex-shrink: 0; margin-top: .125rem; font-size: 1.25rem; color: var(--lagoon); }
 .landing-contact-item small { display: block; margin-bottom: .125rem; font-size: 0.75rem; font-weight: 400; color: var(--mist); }
-a.landing-contact-item:hover { border-color: var(--lagoon); }
+a.landing-contact-item:hover { border-color: var(--brand-lime); box-shadow: inset 0 0 0 1px var(--brand-lime); }
 .landing-contact-map img { height: 100%; min-height: 18rem; aspect-ratio: auto; }
 
 /* Footer of the pages that scroll (dark, like the header); the privacy policy */
@@ -930,12 +930,12 @@ a.landing-contact-item:hover { border-color: var(--lagoon); }
 .site-footer-about p { max-width: 22rem; margin-top: 1rem; line-height: 1.7; }
 .site-footer-social { display: flex; gap: .5rem; margin-top: 1.25rem; }
 .site-footer-social a { display: inline-flex; align-items: center; justify-content: center; width: 2.25rem; height: 2.25rem; border: 1px solid #3a4541; border-radius: 9999px; font-size: 1.125rem; color: #e9ece7; transition: background .15s, border-color .15s; }
-.site-footer-social a:hover { background: var(--lagoon); border-color: var(--lagoon); }
+.site-footer-social a:hover { background: var(--brand-lime); border-color: var(--brand-lime); color: var(--ink); }
 .site-footer-h3 { margin-bottom: 1rem; font-size: 0.75rem; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: #ffffff; }
 .site-footer-links { display: flex; flex-direction: column; gap: .625rem; }
 .site-footer-links li { display: flex; align-items: flex-start; gap: .5rem; }
 .site-footer-links i { margin-top: .2rem; color: #7fb3a9; }
-.site-footer a:hover { color: #ffffff; }
+.site-footer a:hover { color: var(--brand-lime); }
 .site-footer-bottom { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 1rem; max-width: 1180px; margin: 0 auto; padding: 1.25rem 1.75rem 1.75rem; border-top: 1px solid #2a3330; font-size: 0.8125rem; }
 .legal { max-width: 46rem; margin: 0 auto; padding: 2.5rem 1.75rem 0; line-height: 1.75; color: #36403c; }
 .legal-updated { margin: .5rem 0 1.5rem; font-size: 0.875rem; color: var(--mist); }
