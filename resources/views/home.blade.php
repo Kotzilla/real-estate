@@ -1,184 +1,175 @@
 @extends('layouts.site')
 
-{{-- The home page, three columns as on islanders-properties.com: filters | map | listings. The list follows the map
-     (only what is in view, unless switched off); hovering a card lights its pin, a pin lights its card.
-     resources/js/home.js holds the logic (Alpine `propertyMap`); app.css (body.site) the look. --}}
+{{-- The landing page (HomeController): a hero (slideshow, Alpine `heroSlides` in app.js) with buy / rent, the newest listings as plain links (search engines follow
+     them to every listing's page) and the areas, each opening the map search filtered to it. --}}
 @php
-  $labels = [
-      'perMonth' => __('home.per_month'),
-      'reserved' => __('home.reserved'),
-      'orRent' => __('home.or_rent'),
-      'in' => __('home.type_in_area'),
-      'bedrooms' => [__('home.bedroom'), __('home.bedrooms_n')],
-      'bathrooms' => [__('home.bathroom'), __('home.bathrooms_n')],
-      'area' => __('home.living'),
-      'land' => __('home.land'),
-  ];
+  $site = config('site');
+  $thai = app()->getLocale() === 'th';
+  $placeholder = asset('assets/img/placeholder.png');
+  $short = fn ($amount) => $amount >= 1e6 ? number_format($amount / 1e6, 1).'M' : number_format($amount);
 @endphp
 
 @section('title', __('home.title'))
 
-@push('styles')
-  <link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/v3.9.4/mapbox-gl.css">
-@endpush
-
 @push('scripts')
-  <script src="https://api.mapbox.com/mapbox-gl-js/v3.9.4/mapbox-gl.js"></script>
-  @vite('resources/js/home.js')
+  <script>
+    // The hero's slideshow: the next slide every 6 s, paused under the pointer and for reduced motion
+    document.addEventListener('alpine:init', () => {
+      window.Alpine.data('heroSlides', (count) => ({
+        current: 0,
+        timer: null,
+        init() {
+          if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) this.play();
+        },
+        play() {
+          if (count < 2 || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+          clearInterval(this.timer);
+          this.timer = setInterval(() => { this.current = (this.current + 1) % count; }, 6000);
+        },
+        pause() {
+          clearInterval(this.timer);
+        },
+      }));
+    });
+  </script>
 @endpush
-
-@section('nav')
-  <button type="button" onclick="window.dispatchEvent(new CustomEvent('offer', { detail: 'sale' }))" class="site-nav-item"><i class="ki-filled ki-home-2"></i> @lang('home.buy')</button>
-  <button type="button" onclick="window.dispatchEvent(new CustomEvent('offer', { detail: 'rent' }))" class="site-nav-item"><i class="ki-filled ki-key"></i> @lang('home.rent')</button>
-@endsection
 
 @section('content')
-  <div class="home-grid" x-data="propertyMap(@js($listings), @js($map), @js($labels))" @offer.window="offer = $event.detail"
-    :class="{ 'filters-open': filtersOpen }">
-
-    {{-- 1. Filters --}}
-    <aside class="home-filters kt-scrollable-y-auto" aria-label="@lang('home.filters')">
-      <div class="flex items-baseline justify-between">
-        <h2 class="flex items-center gap-2 text-xl font-medium"><i class="ki-filled ki-filter text-[var(--lagoon)]"></i> @lang('home.filters')</h2>
-        <button type="button" class="link-quiet" @click="reset()" :disabled="!filtered">@lang('home.reset')</button>
-      </div>
-
-      <div class="home-filter">
-        <span class="home-filter-label"><i class="ki-filled ki-price-tag"></i> @lang('home.offer')</span>
-        <div class="tabs">
-          @foreach (['all' => 'home.any', 'sale' => 'home.buy', 'rent' => 'home.rent'] as $value => $label)
-            <button type="button" class="tab" :class="{ 'is-on': offer === '{{ $value }}' }" @click="offer = '{{ $value }}'">@lang($label)</button>
+  <div class="kt-scrollable-y-auto grow">
+    <section class="landing-hero" x-data="heroSlides({{ $slides->count() }})" @mouseenter="pause()" @mouseleave="play()">
+      @foreach ($slides as $slide)
+        <div @class(['landing-slide', 'is-on' => $loop->first]) :class="{ 'is-on': current === {{ $loop->index }} }"
+          style="background-image: url('{{ $slide }}')"></div>
+      @endforeach
+      @if ($slides->count() > 1)
+        <div class="landing-dots">
+          @foreach ($slides as $slide)
+            <button type="button" :class="{ 'is-on': current === {{ $loop->index }} }" @click="current = {{ $loop->index }}"
+              aria-label="{{ $loop->iteration }} / {{ $loop->count }}"></button>
           @endforeach
         </div>
-      </div>
-
-      <div class="home-filter">
-        <span class="home-filter-label"><i class="ki-filled ki-category"></i> @lang('home.type')</span>
-        <div class="flex flex-wrap gap-2">
-          @foreach ($types as $value => $label)
-            <button type="button" class="chip" :class="{ 'is-on': types.includes('{{ $value }}') }" @click="toggle('types', '{{ $value }}')">{{ $label }}</button>
-          @endforeach
+      @endif
+      <div class="landing-hero-inner">
+        <h1 class="landing-title">@lang('site.hero_title')</h1>
+        <p class="landing-lead">@lang('site.hero_text')</p>
+        <div class="landing-actions">
+          <a href="{{ route('listings', ['offer' => 'sale']) }}" class="landing-button">
+            <i class="ki-filled ki-home-2"></i> @lang('site.buy_cta') <small>@lang('site.for_sale_n', ['count' => $forSale])</small>
+          </a>
+          <a href="{{ route('listings', ['offer' => 'rent']) }}" class="landing-button">
+            <i class="ki-filled ki-key"></i> @lang('site.rent_cta') <small>@lang('site.for_rent_n', ['count' => $forRent])</small>
+          </a>
         </div>
+        <a href="{{ route('listings') }}" class="landing-map-link"><i class="ki-filled ki-map"></i> @lang('site.map_cta')</a>
       </div>
-
-      <div class="home-filter">
-        <span class="home-filter-label"><i class="ki-filled ki-dollar"></i> <span x-text="offer === 'rent' ? @js(__('home.price_rent')) : @js(__('home.price'))"></span></span>
-        <div class="flex items-center gap-3">
-          <input type="text" inputmode="numeric" class="field-box" :value="minPrice ? money(minPrice) : ''" @input="typePrice('minPrice', $el)"
-            placeholder="@lang('home.min')" aria-label="@lang('home.min')">
-          <span class="text-[var(--mist)]">–</span>
-          <input type="text" inputmode="numeric" class="field-box" :value="maxPrice ? money(maxPrice) : ''" @input="typePrice('maxPrice', $el)"
-            placeholder="@lang('home.max')" aria-label="@lang('home.max')">
-        </div>
-        <div class="price-slider" :style="sliderFill()">
-          <input type="range" min="0" :max="priceCeiling" :step="priceStep" :value="minPrice || 0"
-            @input="slide('minPrice', $el)" aria-label="@lang('home.min')">
-          <input type="range" min="0" :max="priceCeiling" :step="priceStep" :value="maxPrice || priceCeiling"
-            @input="slide('maxPrice', $el)" aria-label="@lang('home.max')">
-        </div>
-      </div>
-
-      <div class="home-filter">
-        <span class="home-filter-label"><i class="ki-filled ki-moon"></i> @lang('home.bedrooms')</span>
-        <div class="tabs">
-          @foreach ([0 => __('home.any'), 1 => '1+', 2 => '2+', 3 => '3+', 4 => '4+'] as $value => $label)
-            <button type="button" class="tab" :class="{ 'is-on': beds === {{ $value }} }" @click="beds = {{ $value }}">{{ $label }}</button>
-          @endforeach
-        </div>
-      </div>
-
-      <div class="home-filter">
-        <span class="home-filter-label"><i class="ki-filled ki-geolocation"></i> @lang('home.areas')</span>
-        <div class="flex flex-col gap-2.5">
-          @foreach ($areas as $area)
-            <label class="check-line">
-              <input type="checkbox" value="{{ $area }}" x-model="areas">
-              <span>{{ $area }}</span>
-              <span class="count">{{ $listings->where('location', $area)->count() }}</span>
-            </label>
-          @endforeach
-        </div>
-      </div>
-
-      <label class="check-line border-t border-[var(--hairline)] pt-5">
-        <input type="checkbox" x-model="followMap">
-        <span>@lang('home.follow_map')</span>
-      </label>
-    </aside>
-
-    {{-- 2. The island --}}
-    <section class="home-map" aria-label="@lang('home.map')">
-      <div x-ref="map" class="size-full"></div>
-      @unless ($map['token'])
-        <div class="absolute inset-0 flex items-center justify-center text-sm text-[var(--mist)]">@lang('home.no_map')</div>
-      @endunless
-      <button type="button" class="home-filters-toggle" @click="filtersOpen = !filtersOpen" :aria-expanded="filtersOpen.toString()">
-        @lang('home.filters') <span x-show="filtered" x-text="'(' + filtered + ')'"></span>
-      </button>
     </section>
 
-    {{-- 3. Listings in view --}}
-    <section class="home-list kt-scrollable-y-auto">
-      <div class="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-3 pb-6">
-        <h1 class="serif text-[1.75rem] leading-tight">
-          <span x-text="visible.length"></span> @lang('home.properties')
-          <span class="sans block text-sm text-[var(--mist)]" x-text="followMap ? @js(__('home.in_view')) : @js(__('home.everywhere'))"></span>
-        </h1>
-        <div class="tabs">
-          @foreach (['newest' => 'home.newest', 'low' => 'home.price_low', 'high' => 'home.price_high'] as $value => $label)
-            <button type="button" class="tab" :class="{ 'is-on': sort === '{{ $value }}' }" @click="sort = '{{ $value }}'">@lang($label)</button>
-          @endforeach
+    @if ($newest->isNotEmpty())
+      <section class="landing-section">
+        <div class="landing-section-head">
+          <h2 class="landing-h2"><i class="ki-filled ki-star"></i> @lang('site.newest')</h2>
+          <a href="{{ route('listings') }}" class="landing-more">@lang('site.see_all') <i class="ki-filled ki-arrow-right"></i></a>
         </div>
-      </div>
-
-      <div class="home-cards">
-        <template x-for="item in visible" :key="item.id">
-          <article :id="'card-' + item.id" class="home-card" :class="{ 'is-active': active === item.id }"
-            @mouseenter="active = item.id" @mouseleave="active = null" @click="focus(item)">
-            <div class="home-card-photo">
-              <img :src="item.photo || '{{ asset('assets/img/placeholder.png') }}'" :alt="item.title" loading="lazy"
-                x-on:error.once="$el.src = '{{ asset('assets/img/placeholder.png') }}'">
-            </div>
-            <div class="home-card-body">
-              <h3 class="home-card-title" x-text="item.title"></h3>
-              <p class="home-card-meta flex items-center gap-1.5">
-                <i class="ki-filled ki-geolocation text-xs text-[var(--mist)]"></i>
-                <span x-text="meta(item)"></span>
-              </p>
-              <div class="home-card-features">
-                <template x-if="item.bedrooms">
-                  <span class="home-card-feature">
-                    <i class="ki-filled ki-home-2"></i>
-                    <span x-text="beds(item)"></span>
-                  </span>
-                </template>
-                <template x-if="item.bathrooms">
-                  <span class="home-card-feature">
-                    <i class="ki-filled ki-drop"></i>
-                    <span x-text="baths(item)"></span>
-                  </span>
-                </template>
-                <template x-if="item.area || item.land">
-                  <span class="home-card-feature">
-                    <i class="ki-filled ki-size"></i>
-                    <span x-text="area(item)"></span>
-                  </span>
-                </template>
+        <div class="landing-cards">
+          @foreach ($newest as $property)
+            <a href="{{ $property->publicUrl() }}" class="home-card">
+              <div class="home-card-photo">
+                <img src="{{ $property->coverPhoto?->src('md') ?? $placeholder }}" alt="{{ $property->title() }}" loading="lazy"
+                  onerror="this.onerror = null; this.src = '{{ $placeholder }}'">
               </div>
-              <div class="home-card-footer">
-                <p class="home-card-price">
-                  <span x-text="'฿' + compact(item.sale ?? item.rent)"></span><small x-show="!item.sale" x-text="labels.perMonth"></small>
-                  <small x-show="item.sale && item.rent" x-text="' ' + labels.orRent.replace(':price', '฿' + compact(item.rent))"></small>
-                  <small x-show="item.reserved" x-text="' ' + labels.reserved"></small>
+              <div class="home-card-body">
+                <h3 class="home-card-title">{{ $property->title() }}</h3>
+                <p class="home-card-meta flex items-center gap-1.5">
+                  <i class="ki-filled ki-geolocation text-xs text-[var(--mist)]"></i>
+                  @lang('home.type_in_area', ['type' => e($property->type->label()), 'area' => e($property->location ?: __('home.island'))])
                 </p>
-                <a :href="item.url" class="home-card-link" @click.stop title="@lang('home.view')" aria-label="@lang('home.view')"><i class="ki-filled ki-eye"></i></a>
+                <div class="home-card-footer">
+                  <p class="home-card-price">
+                    @if ($property->is_sale)
+                      ฿{{ $short((float) $property->sale_price) }}
+                    @else
+                      ฿{{ $short((float) $property->rent_price) }}<small>@lang('home.per_month')</small>
+                    @endif
+                  </p>
+                  <span class="home-card-link" aria-hidden="true"><i class="ki-filled ki-eye"></i></span>
+                </div>
               </div>
-            </div>
-          </article>
-        </template>
+            </a>
+          @endforeach
+        </div>
+      </section>
+    @endif
 
-        <p x-show="!visible.length" x-cloak class="home-cards-empty py-10 text-center text-sm text-[var(--mist)]">@lang('home.empty')</p>
+    @if ($areas->isNotEmpty())
+      <section class="landing-section" id="areas">
+        <h2 class="landing-h2"><i class="ki-filled ki-geolocation"></i> @lang('site.areas')</h2>
+        <p class="landing-sub">@lang('site.areas_text')</p>
+        <div class="landing-areas">
+          @foreach ($areas as $area => $total)
+            <a href="{{ route('listings', ['area' => $area]) }}" class="landing-area">
+              <span>{{ $area }}</span>
+              <small>@lang('site.listings_n', ['count' => $total])</small>
+            </a>
+          @endforeach
+        </div>
+      </section>
+    @endif
+
+    <section class="landing-section" id="about">
+      <div class="landing-about">
+        <div>
+          <h2 class="landing-h2"><i class="ki-filled ki-people"></i> @lang('site.who_title')</h2>
+          <p class="landing-about-lead">@lang('site.who_lead')</p>
+          <p class="landing-about-text">@lang('site.who_text', ['since' => $site['since']])</p>
+          <div class="landing-stats">
+            <div><strong>{{ now()->year - $site['since'] }}+</strong> @lang('site.stat_years')</div>
+            <div><strong>{{ $total }}</strong> @lang('site.stat_listings')</div>
+            <div><strong>{{ $areas->count() }}</strong> @lang('site.stat_areas')</div>
+            <div><strong>{{ $site['team'] }}</strong> @lang('site.stat_team')</div>
+          </div>
+        </div>
+        @if ($slides->isNotEmpty())
+          <img src="{{ $slides->last() }}" alt="" class="landing-about-photo" loading="lazy">
+        @endif
       </div>
     </section>
+
+    <section class="landing-section" id="contact">
+      <h2 class="landing-h2"><i class="ki-filled ki-messages"></i> @lang('site.contact_title')</h2>
+      <p class="landing-sub">@lang('site.contact_text')</p>
+      <div class="landing-contact">
+        <div class="landing-contact-list">
+          <a href="tel:{{ preg_replace('/[^0-9+]/', '', $site['phone']) }}" class="landing-contact-item">
+            <i class="ki-filled ki-phone"></i><span><small>@lang('site.call')</small>{{ $site['phone'] }}</span>
+          </a>
+          <a href="https://line.me/R/ti/p/{{ rawurlencode($site['line']) }}" target="_blank" rel="noopener" class="landing-contact-item">
+            <i class="ki-filled ki-message-text"></i><span><small>@lang('site.line')</small>{{ $site['line'] }}</span>
+          </a>
+          <a href="https://wa.me/{{ $site['whatsapp'] }}" target="_blank" rel="noopener" class="landing-contact-item">
+            <i class="ki-filled ki-whatsapp"></i><span><small>@lang('site.whatsapp')</small>{{ $site['phone'] }}</span>
+          </a>
+          <a href="mailto:{{ $site['email'] }}" class="landing-contact-item">
+            <i class="ki-filled ki-sms"></i><span><small>@lang('site.email')</small>{{ $site['email'] }}</span>
+          </a>
+          <div class="landing-contact-item">
+            <i class="ki-filled ki-geolocation"></i><span><small>@lang('site.office')</small>{{ $thai ? $site['address_th'] : $site['address'] }}</span>
+          </div>
+          <div class="landing-contact-item">
+            <i class="ki-filled ki-time"></i><span><small>@lang('site.hours')</small>{{ $site['hours'][$thai ? 'th' : 'en'] }}</span>
+          </div>
+        </div>
+        <a href="https://www.google.com/maps?q={{ $site['office']['lat'] }},{{ $site['office']['lng'] }}" target="_blank" rel="noopener"
+          class="listing-map landing-contact-map" title="@lang('site.directions')">
+          @if ($mapToken)
+            <img src="https://api.mapbox.com/styles/v1/mapbox/light-v11/static/pin-l+2f6b62({{ $site['office']['lng'] }},{{ $site['office']['lat'] }})/{{ $site['office']['lng'] }},{{ $site['office']['lat'] }},14,0/800x500@2x?access_token={{ $mapToken }}"
+              alt="@lang('site.office_map')" loading="lazy">
+          @else
+            <span>@lang('site.directions')</span>
+          @endif
+        </a>
+      </div>
+    </section>
+
+    @include('layouts.partials.site-footer')
   </div>
 @endsection

@@ -876,6 +876,71 @@ html[lang="th"] body.site { --display: 'Noto Serif Thai', 'playfair-display', se
 .listing-button.is-quiet { background: #ffffff; color: var(--ink); border: 1px solid var(--hairline); }
 .listing-button.is-quiet:hover { border-color: var(--ink); }
 
+/* Landing page (home.blade.php): a full-width beach hero, the newest listings three across, area tiles */
+.landing-hero { position: relative; display: flex; align-items: flex-end; min-height: 32rem; padding: 4rem 1.75rem; overflow: hidden; background: var(--ink); color: #ffffff; }
+.landing-slide { position: absolute; inset: 0; background-size: cover; background-position: center 60%; opacity: 0; transform: scale(1.04); transition: opacity 1.2s ease, transform 7s ease-out; }
+.landing-slide.is-on { opacity: 1; transform: none; }
+.landing-hero::before { content: ''; position: absolute; inset: 0; z-index: 1; background: linear-gradient(to top, rgb(23 32 29 / .75), rgb(23 32 29 / .15) 70%); }
+.landing-hero-inner { z-index: 2; }
+.landing-dots { position: absolute; right: 1.75rem; bottom: 1.75rem; z-index: 3; display: flex; gap: .5rem; }
+.landing-dots button { width: .625rem; height: .625rem; border-radius: 9999px; background: rgb(255 255 255 / .45); transition: background .2s, width .2s; }
+.landing-dots button.is-on { width: 1.75rem; background: #ffffff; }
+.landing-hero-inner { position: relative; width: 100%; max-width: 1180px; margin: 0 auto; }
+.landing-title { max-width: 40rem; font-family: var(--display); font-size: 3.25rem; line-height: 1.1; font-weight: 400; }
+.landing-lead { max-width: 34rem; margin-top: 1rem; font-size: 1.125rem; color: #e9ece7; }
+.landing-actions { display: flex; flex-wrap: wrap; gap: .75rem; margin-top: 2rem; }
+.landing-button { display: inline-flex; align-items: center; gap: .5rem; padding: .875rem 1.25rem; border-radius: 6px; background: #ffffff; color: var(--ink); font-weight: 600; transition: background .15s, color .15s; }
+.landing-button i { color: var(--lagoon); }
+.landing-button small { font-weight: 400; color: var(--mist); }
+.landing-button:hover { background: var(--lagoon); color: #ffffff; }
+.landing-button:hover i, .landing-button:hover small { color: #ffffff; }
+.landing-map-link { display: inline-flex; align-items: center; gap: .375rem; margin-top: 1.25rem; color: #e9ece7; text-decoration: underline; text-underline-offset: 4px; }
+.landing-map-link:hover { color: #ffffff; }
+.landing-section { max-width: 1180px; margin: 0 auto; padding: 3.5rem 1.75rem 0; }
+.landing-section-head { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; }
+.landing-h2 { display: flex; align-items: center; gap: .5rem; font-family: var(--display); font-size: 1.75rem; font-weight: 400; }
+.landing-h2 i { font-size: 1.25rem; color: var(--lagoon); }
+.landing-sub { margin-top: .375rem; color: var(--mist); }
+.landing-more { display: inline-flex; align-items: center; gap: .375rem; font-size: 0.875rem; font-weight: 500; color: var(--lagoon); white-space: nowrap; }
+.landing-cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1.5rem; margin-top: 1.5rem; }
+.landing-cards .home-card:hover .home-card-link { background: var(--lagoon); border-color: var(--lagoon); color: #ffffff; }
+.landing-areas { display: grid; grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr)); gap: .75rem; margin-top: 1.5rem; }
+.landing-area { display: flex; flex-direction: column; gap: .125rem; padding: 1rem 1.125rem; border: 1px solid var(--hairline); border-radius: 8px; background: #ffffff; font-weight: 600; transition: border-color .15s; }
+.landing-area small { font-weight: 400; font-size: 0.8125rem; color: var(--mist); }
+.landing-area:hover { border-color: var(--lagoon); }
+
+/* Who we are / Contact us on the landing page */
+.landing-about { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 3rem; align-items: center; }
+.landing-about-lead { margin-top: 1rem; font-family: var(--display); font-size: 1.375rem; line-height: 1.4; }
+.landing-about-text { margin-top: 1rem; line-height: 1.75; color: #36403c; }
+.landing-stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.25rem 2rem; margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--hairline); font-size: 0.875rem; color: var(--mist); }
+.landing-stats strong { display: block; font-family: var(--display); font-size: 2rem; font-weight: 400; line-height: 1.1; color: var(--lagoon); }
+.landing-about-photo { width: 100%; aspect-ratio: 4 / 5; object-fit: cover; border-radius: 8px; }
+.landing-contact { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); gap: 1.5rem; margin-top: 1.5rem; }
+.landing-contact-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .75rem; align-content: start; }
+.landing-contact-item { display: flex; align-items: flex-start; gap: .75rem; padding: 1rem; border: 1px solid var(--hairline); border-radius: 8px; background: #ffffff; font-size: 0.875rem; font-weight: 500; overflow-wrap: anywhere; transition: border-color .15s; }
+.landing-contact-item i { flex-shrink: 0; margin-top: .125rem; font-size: 1.25rem; color: var(--lagoon); }
+.landing-contact-item small { display: block; margin-bottom: .125rem; font-size: 0.75rem; font-weight: 400; color: var(--mist); }
+a.landing-contact-item:hover { border-color: var(--lagoon); }
+.landing-contact-map img { height: 100%; min-height: 18rem; aspect-ratio: auto; }
+
+/* Footer of the pages that scroll (dark, like the header); the privacy policy */
+.site-footer { margin-top: 4.5rem; background: var(--ink); color: #a9b2ad; font-size: 0.875rem; }
+.site-footer-grid { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) minmax(0, 1.3fr); gap: 2.5rem; max-width: 1180px; margin: 0 auto; padding: 3.5rem 1.75rem 2.5rem; }
+.site-footer-about p { max-width: 22rem; margin-top: 1rem; line-height: 1.7; }
+.site-footer-social { display: flex; gap: .5rem; margin-top: 1.25rem; }
+.site-footer-social a { display: inline-flex; align-items: center; justify-content: center; width: 2.25rem; height: 2.25rem; border: 1px solid #3a4541; border-radius: 9999px; font-size: 1.125rem; color: #e9ece7; transition: background .15s, border-color .15s; }
+.site-footer-social a:hover { background: var(--lagoon); border-color: var(--lagoon); }
+.site-footer-h3 { margin-bottom: 1rem; font-size: 0.75rem; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: #ffffff; }
+.site-footer-links { display: flex; flex-direction: column; gap: .625rem; }
+.site-footer-links li { display: flex; align-items: flex-start; gap: .5rem; }
+.site-footer-links i { margin-top: .2rem; color: #7fb3a9; }
+.site-footer a:hover { color: #ffffff; }
+.site-footer-bottom { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 1rem; max-width: 1180px; margin: 0 auto; padding: 1.25rem 1.75rem 1.75rem; border-top: 1px solid #2a3330; font-size: 0.8125rem; }
+.legal { max-width: 46rem; margin: 0 auto; padding: 2.5rem 1.75rem 0; line-height: 1.75; color: #36403c; }
+.legal-updated { margin: .5rem 0 1.5rem; font-size: 0.875rem; color: var(--mist); }
+.legal .listing-h2 { margin: 2rem 0 .5rem; color: var(--ink); }
+
 /* Price pins: ink for sale, paper for rent, lagoon when its card is hovered */
 .map-pin {
     padding: 0.25rem 0.625rem; border: 1px solid var(--ink); border-radius: 9999px; cursor: pointer;
@@ -887,7 +952,7 @@ html[lang="th"] body.site { --display: 'Noto Serif Thai', 'playfair-display', se
 .map-pin.is-active { z-index: 5; transform: scale(1.12); background: var(--lagoon); border-color: var(--lagoon); color: #ffffff; }
 
 @media (prefers-reduced-motion: reduce) {
-    .home-card-photo img, .map-pin, .home-filters { transition: none; }
+    .home-card-photo img, .map-pin, .home-filters, .landing-slide { transition: none; }
 }
 @media (max-width: 1279.98px) {
     .home-grid { grid-template-columns: minmax(280px, 1fr) minmax(520px, 1.3fr); }
@@ -904,6 +969,13 @@ html[lang="th"] body.site { --display: 'Noto Serif Thai', 'playfair-display', se
     .site-wordmark-place { display: none; }
 }
 @media (max-width: 1023.98px) {
+    .landing-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .landing-title { font-size: 2.5rem; }
+    .landing-hero, .landing-section, .site-footer-grid, .site-footer-bottom, .legal { padding-inline: 1rem; }
+    .landing-about, .landing-contact { grid-template-columns: minmax(0, 1fr); }
+    .landing-about-photo { aspect-ratio: 16 / 9; }
+    .site-footer-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+    .site-footer-about { grid-column: 1 / -1; }
     .listing { padding-inline: 1rem; }
     .listing-body { grid-template-columns: minmax(0, 1fr); }
     .listing-aside { position: static; }
@@ -911,6 +983,12 @@ html[lang="th"] body.site { --display: 'Noto Serif Thai', 'playfair-display', se
 @media (max-width: 639.98px) {
     .home-cards { grid-template-columns: minmax(0, 1fr); }
     .listing-title { font-size: 1.75rem; }
+    .landing-cards { grid-template-columns: minmax(0, 1fr); }
+    .landing-contact-list, .site-footer-grid { grid-template-columns: minmax(0, 1fr); }
+    .landing-hero { min-height: 26rem; }
+    .landing-title { font-size: 2rem; }
+    .site-nav-item { font-size: 0; gap: 0; }
+    .site-nav-item i { font-size: 1.125rem; }
     .listing-gallery { grid-template-columns: 1fr 1fr; grid-template-rows: 14rem 7rem; }
     .listing-gallery img:first-child { grid-row: auto; grid-column: 1 / -1; }
     .listing-gallery img:nth-child(n+4) { display: none; }

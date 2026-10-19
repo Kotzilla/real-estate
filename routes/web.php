@@ -16,9 +16,11 @@ use App\Models\User;
 use Illuminate\Support\Facades\Route;
 use Spatie\Activitylog\Models\Activity;
 
-// Public site: the home page's map of Koh Phangan and its listings
+// Public site: the landing page, the map search, a listing's page, the privacy policy
 Route::get('/', HomeController::class)->name('home');
-Route::get('/property/{code}/{slug?}', ListingController::class)->where('code', '[A-Z]{3}-[0-9]+')->name('listing');
+Route::get('/properties', [ListingController::class, 'index'])->name('listings');
+Route::get('/property/{code}/{slug?}', [ListingController::class, 'show'])->where('code', '[A-Z]{3}-[0-9]+')->name('listing');
+Route::view('/privacy', 'privacy')->name('privacy');
 Route::redirect('/login', '/backend/login');
 Route::get('/lang/{locale}', [LocaleController::class, 'switch'])->name('lang.switch');
 

@@ -36,7 +36,7 @@ class ListingPageTest extends TestCase
             ->getContent();
         $this->assertSame(substr_count($html, '<div'), substr_count($html, '</div>'));
 
-        $this->assertSame([$url], $this->get('/')->viewData('listings')->pluck('url')->all());
+        $this->assertSame([$url], $this->get('/properties')->viewData('listings')->pluck('url')->all());
     }
 
     public function test_an_old_or_missing_slug_moves_to_the_current_url(): void

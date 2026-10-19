@@ -1,7 +1,14 @@
-{{-- The public site's page: the dark header (wordmark, buy / rent, language, staff sign-in) and the page below it at
+{{-- The public site's page: the dark header (wordmark, home / buy / rent, language, staff sign-in) and the page below it at
      full height. Metronic's theme underneath, the site's own palette on body.site (app.css); Livewire's script for Alpine. --}}
 @php
   $locales = ['en' => ['EN', 'united-states.svg'], 'th' => ['TH', 'thailand.svg']];
+  $offer = request()->routeIs('listings') ? request('offer') : null;
+  $menu = [
+      [route('home'), 'ki-element-11', 'site.home', request()->routeIs('home')],
+      [route('listings', ['offer' => 'sale']), 'ki-home-2', 'home.buy', $offer === 'sale'],
+      [route('listings', ['offer' => 'rent']), 'ki-key', 'home.rent', $offer === 'rent'],
+      [route('home').'#contact', 'ki-messages', 'site.contact', false],
+  ];
 @endphp
 <!DOCTYPE html>
 <html class="h-full" data-kt-theme="true" data-kt-theme-mode="light" lang="{{ str_replace('_', '-', app()->getLocale()) }}">
@@ -34,7 +41,9 @@
     </a>
 
     <nav class="site-nav" aria-label="@lang('home.menu')">
-      @yield('nav')
+      @foreach ($menu as [$url, $icon, $label, $current])
+        <a href="{{ $url }}" @class(['site-nav-item', 'is-current' => $current]) @if ($current) aria-current="page" @endif><i class="ki-filled {{ $icon }}"></i> @lang($label)</a>
+      @endforeach
       <span class="site-nav-sep"></span>
       @foreach ($locales as $code => [$label, $flag])
         <a href="{{ route('lang.switch', $code) }}" class="{{ app()->getLocale() === $code ? 'is-current' : '' }}" lang="{{ $code }}"><img alt="" class="site-flag" src="{{ asset('assets/media/flags/'.$flag) }}">{{ $label }}</a>

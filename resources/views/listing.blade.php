@@ -35,15 +35,10 @@
   @endif
 @endpush
 
-@section('nav')
-  <a href="{{ route('home', ['offer' => 'sale']) }}" class="site-nav-item"><i class="ki-filled ki-home-2"></i> @lang('home.buy')</a>
-  <a href="{{ route('home', ['offer' => 'rent']) }}" class="site-nav-item"><i class="ki-filled ki-key"></i> @lang('home.rent')</a>
-@endsection
-
 @section('content')
   <div class="kt-scrollable-y-auto grow">
     <article class="listing">
-      <a href="{{ route('home') }}" class="listing-back"><i class="ki-filled ki-arrow-left"></i> @lang('listing.back')</a>
+      <a href="{{ route('listings') }}" class="listing-back"><i class="ki-filled ki-arrow-left"></i> @lang('listing.back')</a>
 
       <header class="listing-head">
         <div>
@@ -140,5 +135,7 @@
         </aside>
       </div>
     </article>
+
+    @include('layouts.partials.site-footer')
   </div>
 @endsection

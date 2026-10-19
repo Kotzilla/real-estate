@@ -1,4 +1,4 @@
-// The home page's map and listings (views/home.blade.php): Alpine `propertyMap`. Filters narrow the listings; the map
+// The map search's map and listings (views/listings.blade.php, /properties): Alpine `propertyMap`. Filters narrow the listings; the map
 // shows their pins (price labels); the list shows the ones in view when "follow the map" is on. The Mapbox map and its
 // markers live outside Alpine's reactive state — a proxied map breaks Mapbox.
 const FILTERS = { offer: 'all', types: [], areas: [], minPrice: '', maxPrice: '', beds: 0 };
@@ -12,7 +12,9 @@ document.addEventListener('alpine:init', () => {
       listings,
       labels,
       ...structuredClone(FILTERS),
+      // the landing page and the header link here with ?offer=sale|rent and ?area=Srithanu
       offer: new URLSearchParams(location.search).get('offer') || 'all',
+      areas: new URLSearchParams(location.search).getAll('area'),
       sort: 'newest',
       followMap: true,
       bounds: null,
