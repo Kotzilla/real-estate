@@ -1,0 +1,10 @@
+{
+    "ignore": [
+        "adjoining-classes",
+        "order-alphabetical",
+        "selector-max-approaching",
+        "property-sort-order",
+        "unique-headings",
+        "important"
+    ]
+}

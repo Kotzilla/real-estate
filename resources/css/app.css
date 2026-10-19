@@ -1,0 +1,694 @@
+/*
+ * Overrides on top of the Metronic 9 theme (already a Tailwind 4 build, loaded from
+ * public/assets/css/styles.css). This is a utilities-only Tailwind 4 build that fills the gaps:
+ * the prebuilt theme only contains utilities its demo pages used. No preflight, no theme colours,
+ * so it can't fight the theme; unknown/themed classes simply generate nothing.
+ */
+@layer theme, base, components, utilities;
+@import 'tailwindcss/utilities' layer(utilities);
+@theme {
+    --spacing: 0.25rem;
+    /* Tailwind 4 default; this build has no theme, so shadow sizes must be declared to be usable. */
+    --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+    --shadow-2xl: 0 25px 50px -12px rgb(0 0 0 / 0.25); /* modals and drawers */
+    /* Tailwind default palette we actually use, so bg-/text-/border-* utilities generate. */
+    --color-green-400: #4ade80;
+    --color-green-500: #22c55e;
+    --color-green-600: #16a34a;
+    --color-green-700: #15803d;
+    --color-green-900: #14532d;
+    --color-amber-500: #f59e0b;
+    --color-amber-600: #d97706;
+    --color-emerald-400: #34d399;
+    --color-emerald-500: #10b981;
+    --color-emerald-600: #059669;
+    --color-emerald-700: #047857;
+    --color-lime-400: #a3e635;
+    --color-lime-500: #84cc16;
+    --color-lime-600: #65a30d;
+    --color-lime-700: #4d7c0f;
+    --color-lime-900: #365314;
+    --color-slate-400: #94a3b8;
+    --color-slate-500: #64748b;
+}
+@source '../views';
+
+/* Filter card selects: one column on phones, three from 768px up. A custom (unlayered) class on purpose: a `md:grid-cols-3`
+   from this build would lose to the theme's plain `grid-cols-1`, because the theme stylesheet loads after ours. */
+.filter-grid { display: grid; gap: 0.75rem; grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 48rem) {
+    .filter-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .filter-grid > .filter-span-2 { grid-column: span 2; } /* e.g. the Tasks status buttons beside Priority */
+}
+
+/* A dashboard card's body that takes the row's height instead of setting it (a list beside the Earnings chart): the
+   scroller is absolute, so the row is as tall as its neighbour and the list scrolls inside. Stacked on phones there is
+   no neighbour, so it keeps a height of its own there. Use: <div class="dashboard-card-fill"><div class="kt-scrollable-y-auto">… */
+.dashboard-card-fill { position: relative; flex: 1 1 auto; min-height: 20rem; }
+.dashboard-card-fill > .kt-scrollable-y-auto { position: absolute; inset: 0; }
+@media (min-width: 64rem) {
+    .dashboard-card-fill { min-height: 0; }
+}
+/* A row of list cards only (nothing sets its height): each list gets a fixed one and scrolls inside */
+.dashboard-lists .dashboard-card-fill { min-height: 26rem; }
+
+/* Sidebar pinned projects: a long name ends in "…" instead of widening the menu. The theme's .kt-menu-title is a flex box,
+   which ignores text-overflow, so the title turns block here. `width: 0` + `flex: 1 1 0` keep the name's length out of the
+   menu's own width (the sidebar scroller is shrink-0 and would grow to the longest line); the title then fills what is left. */
+.menu-truncate, .menu-truncate .kt-menu-link { min-width: 0; }
+.menu-truncate .kt-menu-title { display: block; flex: 1 1 0; width: 0; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; line-height: 1.4; }
+
+/* tables: every cell on one line; the table scrolls sideways instead (all sit in kt-scrollable-x-auto). Two-line cells
+   built from block elements (cost + spent, name + sub-line) still stack. */
+.kt-table :is(th, td) { white-space: nowrap; }
+
+/* desktop: a .cell-fill column takes its share (--fill) of the width the other columns leave; each .cell-clamp inside it
+   wraps and is cut with "…" after --lines lines (default 2; put the full text in a title attribute), so long names
+   never push the Actions column off screen. Below 1024px cells stay one line and the table scrolls like the rest.
+   <th class="cell-fill" style="--fill: 60%"> … <td class="cell-fill"><a class="cell-clamp" title="…">…</a></td>
+   (a .cell-clamp inside a flex row next to a dot or icon works too: it gets min-width 0) */
+@media (min-width: 64rem) {
+    .kt-table th.cell-fill { width: var(--fill, auto); }
+    .kt-table td.cell-fill { max-width: 0; white-space: normal; }
+    .kt-table td.cell-fill .cell-clamp {
+        display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: var(--lines, 2); line-clamp: var(--lines, 2);
+        min-width: 0; overflow: hidden; overflow-wrap: anywhere; white-space: normal;
+    }
+}
+
+/* card headers: the theme has no vertical padding (only min-height 56px), so a header that wraps on a phone puts the
+   title against the card's top edge. */
+.kt-card-header { padding-block: calc(var(--spacing, 0.25rem) * 5); } /* 20px, the same as the theme's side padding */
+
+/* phones: a list header's toolbar takes the whole row; its selects go full width, the search box fills its row
+   (next to the Reset button) instead of their fixed tablet/desktop widths */
+@media (max-width: 47.99rem) {
+    .kt-card-header > .kt-card-toolbar { width: 100%; }
+    .kt-card-toolbar > [x-data^="ktSelect"] { width: 100%; }
+    .kt-card-toolbar > .search-box { flex: 1 1 12rem; width: auto; }
+}
+
+/* pagination (vendor/pagination/kt-livewire): the page numbers only from tablet width; a phone gets << < > >> */
+.page-numbers { display: none; }
+@media (min-width: 48rem) {
+    .page-numbers { display: flex; align-items: center; gap: 0.25rem; }
+}
+
+/* a short field (e.g. one select) in a wide form: full width on phones, a quarter from md up */
+@media (min-width: 48rem) {
+    .md-w-quarter { width: 25%; }
+}
+
+/* Extra-small button: the theme only ships kt-btn-sm (h-7), which is too tall for inline row actions. */
+.kt-btn-xs {
+    height: calc(var(--spacing, 0.25rem) * 5);
+    gap: calc(var(--spacing, 0.25rem) * 1);
+    border-radius: calc(var(--radius) - 2px);
+    padding-inline: calc(var(--spacing, 0.25rem) * 2);
+    font-size: 0.6875rem;
+    line-height: 1;
+}
+
+/* Timeline: a quotation milestone's planned span (a dashed band, so it reads as a plan next to the solid task bars). */
+.tl-milestone {
+    background: color-mix(in oklab, var(--primary) 18%, transparent);
+    border: 1px dashed var(--primary);
+}
+
+/* Comment delete button: keep the label and icon black on hover (the destructive theme turns them white). */
+.kt-btn.comment-delete:hover,
+.kt-btn.comment-delete:hover i {
+    color: #000 !important;
+}
+
+/* Table headers: very light primary tint on white so it stays lighter than the #f1ede8 page background.
+   Semibold font weight (600) gives crisp definition and visual hierarchy on the light background. */
+.kt-table thead th {
+    background-color: color-mix(in oklab, var(--primary) 2%, #ffffff);
+    font-weight: 600;
+    color: var(--foreground);
+    white-space: nowrap; /* headers stay on one line; the table scrolls sideways (kt-scrollable-x-auto) if it must */
+}
+/* The theme pads tbody cells only: a footer (totals) row gets the same side padding, so its figures line up with the
+   body columns, and a little more height than a body row */
+.kt-table tfoot td {
+    padding-inline: calc(var(--spacing) * 4);
+    padding-block: calc(var(--spacing) * 4);
+}
+/* …except its first cell, which keeps the theme's first-column indent, so a left-aligned total label (Expenses by type)
+   lines up with the column above it */
+.kt-table tfoot td:first-child {
+    padding-inline-start: calc(var(--spacing) * 5);
+}
+
+/* Profit figures: dark green, readable on the light page. Not Tailwind's dark: variant, which follows the OS setting
+   (a Mac in dark mode would turn it light green on our light page); the app's own dark mode switches it instead */
+/* light pink badge, dark text (Freelance on the users list); the theme has no pink variant */
+.kt-badge.badge-pink { background-color: #fce7f3; color: #9d174d; border: 1px solid #fbcfe8; }
+html.dark .kt-badge.badge-pink,
+[data-kt-theme-mode="dark"] .kt-badge.badge-pink { background-color: rgb(236 72 153 / 0.15); color: #f9a8d4; border-color: rgb(236 72 153 / 0.3); }
+
+.text-profit { color: #166534; }
+html.dark .text-profit,
+[data-kt-theme-mode="dark"] .text-profit { color: #4ade80; }
+
+/* projects list: how much of the job is paid (Project::paymentProgress) */
+.pay-dot { display: inline-block; flex: none; width: 0.5rem; height: 0.5rem; border-radius: 9999px; }
+.pay-dot-gray { background-color: #9ca3af; }
+.pay-dot-yellow { background-color: #eab308; }
+.pay-dot-green { background-color: #22c55e; }
+.pay-dot-purple { background-color: #a855f7; }
+
+/* project tab count > 0: the theme's yellow warning badge, black text (its white is unreadable on yellow) */
+.kt-badge.kt-badge-warning.badge-count { color: #000; }
+
+html.dark .kt-table thead th,
+[data-kt-theme-mode="dark"] .kt-table thead th {
+    background-color: color-mix(in oklab, var(--primary) 6%, var(--color-background, #18181b));
+    font-weight: 600;
+    color: var(--foreground);
+}
+
+
+
+
+/* Main content background: distinct light gray so white cards stand out cleanly */
+.demo1 main#content {
+    background-color: #eaedf2 !important;
+}
+html.dark .demo1 main#content,
+[data-kt-theme-mode="dark"] .demo1 main#content {
+    background-color: transparent !important;
+}
+
+/* Card & Popover fallback utilities */
+.bg-card {
+    background-color: var(--card);
+}
+.text-card-foreground {
+    color: var(--card-foreground);
+}
+
+/* Inputs: 14px instead of the theme's 13px (unlayered, so it beats the theme's layered rule). */
+.kt-input {
+    font-size: 0.875rem;
+}
+
+
+/* Sarabun covers both English and Thai (same files as elib). Unlayered, so it beats the theme's --font-sans. */
+@font-face {
+    font-family: 'Sarabun';
+    font-style: normal;
+    font-weight: 300;
+    font-display: swap;
+    src: url('../fonts/Sarabun-Light.woff2') format('woff2');
+}
+@font-face {
+    font-family: 'Sarabun';
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url('../fonts/Sarabun-Regular.woff2') format('woff2');
+}
+@font-face {
+    font-family: 'Sarabun';
+    font-style: normal;
+    font-weight: 500;
+    font-display: swap;
+    src: url('../fonts/Sarabun-Medium.woff2') format('woff2');
+}
+@font-face {
+    font-family: 'Sarabun';
+    font-style: normal;
+    font-weight: 600;
+    font-display: swap;
+    src: url('../fonts/Sarabun-SemiBold.woff2') format('woff2');
+}
+@font-face {
+    font-family: 'Sarabun';
+    font-style: normal;
+    font-weight: 700;
+    font-display: swap;
+    src: url('../fonts/Sarabun-Bold.woff2') format('woff2');
+}
+
+:root {
+    --font-sans: 'Sarabun', ui-sans-serif, system-ui, sans-serif;
+}
+html,
+body {
+    font-family: var(--font-sans);
+}
+
+/* Every scrollbar the kt-scrollable-* classes don't cover (the page itself, date picker, SweetAlert...) gets the theme's
+   thin look. In the base layer, under the theme's components layer, so kt-scrollable-* (incl. the sidebar's show-on-hover)
+   still wins. scrollbar-color for Chrome/Firefox, ::-webkit-scrollbar for Safari. */
+@layer base {
+    * {
+        scrollbar-width: thin;
+        scrollbar-color: var(--scrollbar-thumb-color, var(--color-input)) transparent;
+    }
+    ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+        background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+        background-color: var(--scrollbar-thumb-color, var(--color-input));
+        border-radius: 8px;
+    }
+}
+
+/* Alpine: hide elements with x-cloak until Alpine has initialised. */
+[x-cloak] {
+    display: none !important;
+}
+
+/* Textarea sized by the `limitedTextarea` Alpine helper (see app.js). */
+.kt-textarea.auto-size {
+    min-height: 5rem;
+    max-height: 16rem;
+    overflow-y: auto;
+    resize: none;
+}
+
+/* Required-field marker: <label class="required">Name</label> */
+.required::after {
+    content: ' *';
+    color: var(--destructive);
+}
+
+/* flatpickr, themed with the Metronic tokens (the calendar is appended to <body>, above drawers). */
+.flatpickr-calendar {
+    background: var(--color-background);
+    color: var(--color-foreground);
+    border: 1px solid var(--border);
+    box-shadow: 0 4px 12px rgb(0 0 0 / 0.12);
+    font-family: inherit;
+}
+.flatpickr-calendar.arrowTop::before,
+.flatpickr-calendar.arrowTop::after { display: none; }
+.flatpickr-months .flatpickr-month,
+.flatpickr-current-month .flatpickr-monthDropdown-months,
+.flatpickr-current-month input.cur-year,
+span.flatpickr-weekday { background: transparent; color: var(--color-foreground); fill: var(--color-foreground); }
+.flatpickr-months .flatpickr-prev-month,
+.flatpickr-months .flatpickr-next-month { color: var(--color-foreground); fill: var(--color-foreground); }
+.flatpickr-day { color: var(--color-foreground); }
+.flatpickr-day:hover { background: var(--muted); border-color: var(--muted); }
+.flatpickr-day.today { border-color: var(--primary); }
+.flatpickr-day.selected,
+.flatpickr-day.selected:hover { background: var(--primary); border-color: var(--primary); color: #fff; }
+.flatpickr-day.prevMonthDay,
+.flatpickr-day.nextMonthDay,
+.flatpickr-day.flatpickr-disabled { color: var(--muted-foreground); }
+
+/* flatpickr header: smaller month/year (default is 135% of the calendar font). */
+.flatpickr-calendar .flatpickr-current-month {
+    font-size: 0.875rem;
+    font-weight: 500;
+    padding-top: 9px;
+}
+.flatpickr-calendar .flatpickr-current-month .flatpickr-monthDropdown-months,
+.flatpickr-calendar .flatpickr-current-month input.cur-year {
+    font-size: 0.875rem;
+    font-weight: 500;
+    height: auto;
+}
+.flatpickr-calendar .flatpickr-current-month .numInputWrapper { width: 5.5ch; }
+.flatpickr-calendar span.flatpickr-weekday { font-size: 0.75rem; }
+.flatpickr-calendar .flatpickr-day { font-size: 0.8125rem; }
+
+/* range mode (dateRangePicker): the days between the ends, and the quick ranges listed beside the calendar */
+/* .flatpickr-calendar prefix: flatpickr's own CSS is bundled with the JS and loads after this file */
+.flatpickr-calendar .flatpickr-day.startRange,
+.flatpickr-calendar .flatpickr-day.endRange,
+.flatpickr-calendar .flatpickr-day.startRange:hover,
+.flatpickr-calendar .flatpickr-day.endRange:hover { background: var(--primary); border-color: var(--primary); color: #fff; box-shadow: none; }
+.flatpickr-calendar .flatpickr-day.inRange,
+.flatpickr-calendar .flatpickr-day.inRange:hover {
+    --fp-range: color-mix(in oklab, var(--primary) 12%, var(--color-background));
+    background: var(--fp-range);
+    border-color: transparent;
+    box-shadow: -5px 0 0 var(--fp-range), 5px 0 0 var(--fp-range); /* flatpickr fills the gaps between days with a shadow */
+}
+.flatpickr-calendar.has-ranges { width: auto; }
+.flatpickr-calendar.has-ranges.open { display: flex; }
+.flatpickr-main { position: relative; } /* the month arrows sit on the calendar, not over the list */
+.flatpickr-ranges {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 8.5rem;
+    padding: 0.5rem;
+    border-inline-end: 1px solid var(--border);
+}
+.flatpickr-ranges button {
+    padding: 0.375rem 0.625rem;
+    border-radius: 0.375rem;
+    font-size: 0.8125rem;
+    text-align: start;
+    white-space: nowrap;
+    color: var(--color-foreground);
+}
+.flatpickr-ranges button:hover { background: var(--muted); }
+.flatpickr-ranges button.active { background: var(--primary); color: #fff; }
+
+
+/* Dashboard metric cards: 2 per row on small screens, one column per card (--cols) from lg up. */
+.dash-metrics { display: grid; gap: 1rem; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+@media (min-width: 1024px) {
+    .dash-metrics { grid-template-columns: repeat(var(--cols, 4), minmax(0, 1fr)); }
+}
+
+/* Gap utilities for role card icons, badges and hover states (Metronic 9 palette) */
+.bg-destructive\/10 {
+    background-color: color-mix(in oklab, var(--destructive, #e7000b) 10%, transparent);
+}
+.bg-info\/10 {
+    background-color: color-mix(in oklab, var(--color-violet-500, #8b5cf6) 12%, transparent);
+}
+.bg-warning\/10 {
+    background-color: color-mix(in oklab, var(--color-yellow-500, #eab308) 14%, transparent);
+}
+html.dark .bg-destructive\/10,
+[data-kt-theme-mode="dark"] .bg-destructive\/10 {
+    background-color: color-mix(in oklab, var(--destructive, #e7000b) 20%, transparent);
+}
+html.dark .bg-info\/10,
+[data-kt-theme-mode="dark"] .bg-info\/10 {
+    background-color: color-mix(in oklab, var(--color-violet-500, #8b5cf6) 20%, transparent);
+}
+html.dark .bg-warning\/10,
+[data-kt-theme-mode="dark"] .bg-warning\/10 {
+    background-color: color-mix(in oklab, var(--color-yellow-500, #eab308) 20%, transparent);
+}
+
+.text-info {
+    color: var(--color-violet-600, #7c3aed);
+}
+html.dark .text-info,
+[data-kt-theme-mode="dark"] .text-info {
+    color: #a78bfa;
+}
+
+.text-warning {
+    color: #ca8a04;
+}
+html.dark .text-warning,
+[data-kt-theme-mode="dark"] .text-warning {
+    color: #facc15;
+}
+
+.hover\:border-destructive:hover {
+    border-color: color-mix(in oklab, var(--destructive, #e7000b) 60%, transparent);
+}
+.hover\:border-primary:hover {
+    border-color: color-mix(in oklab, var(--primary) 60%, transparent);
+}
+.hover\:border-info:hover {
+    border-color: color-mix(in oklab, var(--color-violet-500, #8b5cf6) 60%, transparent);
+}
+.hover\:border-warning:hover {
+    border-color: color-mix(in oklab, var(--color-yellow-500, #eab308) 60%, transparent);
+}
+
+/* Solid warning badge contrast fix: Metronic default uses white text on yellow-400 (unreadable 1.3:1 contrast).
+   Use rich warm amber with dark zinc text for crisp, accessible 10:1+ contrast while keeping the true yellow badge color. */
+.kt-badge.kt-badge-warning:not(.kt-badge-outline):not(.kt-badge-light):not(.kt-badge-ghost),
+.kt-badge-warning:not(.kt-badge-outline):not(.kt-badge-light):not(.kt-badge-ghost) {
+    background-color: #fbbf24;
+    color: #18181b;
+    font-weight: 600;
+}
+html.dark .kt-badge.kt-badge-warning:not(.kt-badge-outline):not(.kt-badge-light):not(.kt-badge-ghost),
+html.dark .kt-badge-warning:not(.kt-badge-outline):not(.kt-badge-light):not(.kt-badge-ghost),
+[data-kt-theme-mode="dark"] .kt-badge.kt-badge-warning:not(.kt-badge-outline):not(.kt-badge-light):not(.kt-badge-ghost),
+[data-kt-theme-mode="dark"] .kt-badge-warning:not(.kt-badge-outline):not(.kt-badge-light):not(.kt-badge-ghost) {
+    background-color: #f59e0b;
+    color: #09090b;
+}
+
+/* Livewire exception modal: provide full dark backdrop overlay and elevated modal
+   so exception details stand out cleanly without sinking/blending into the application background */
+dialog#livewire-error {
+    position: fixed !important;
+    inset: 0 !important;
+    margin: auto !important;
+    width: min(96vw, 1400px) !important;
+    height: 92vh !important;
+    max-width: 96vw !important;
+    max-height: 92vh !important;
+    border: 1px solid rgba(0, 0, 0, 0.2) !important;
+    border-radius: 12px !important;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(0, 0, 0, 0.1) !important;
+    z-index: 99999 !important;
+    overflow: hidden !important;
+    background: #18181b !important;
+}
+dialog#livewire-error::backdrop {
+    background-color: rgba(15, 23, 42, 0.75) !important;
+    backdrop-filter: blur(4px) !important;
+    -webkit-backdrop-filter: blur(4px) !important;
+}
+dialog#livewire-error iframe {
+    width: 100% !important;
+    height: 100% !important;
+    border: none !important;
+    border-radius: 12px !important;
+}
+
+
+
+
+/* Light red icon/button (e.g. remove line item): tinted like the light-primary buttons. */
+.kt-btn-danger-light {
+    background-color: color-mix(in oklab, var(--destructive, #e7000b) 10%, transparent);
+    border-color: color-mix(in oklab, var(--destructive, #e7000b) 15%, transparent);
+    color: var(--destructive, #e7000b);
+}
+.kt-btn-danger-light:hover {
+    background-color: color-mix(in oklab, var(--destructive, #e7000b) 20%, transparent);
+    color: var(--destructive, #e7000b);
+}
+
+/* Timeline-style tables (project timeline, Income by client): the current week / year / month column */
+.tl-head-current { background-color: color-mix(in oklab, var(--primary) 15%, var(--color-background)); }
+.tl-col-current { background-color: color-mix(in oklab, var(--primary) 5%, var(--color-background)); }
+
+/* ApexCharts: the theme stacks legend items in a column (made for side legends); a legend above or below a chart runs in
+   a row. Two classes so it wins over the theme's single-class rule, which loads after this file. */
+.apexcharts-legend.apx-legend-position-bottom,
+.apexcharts-legend.apx-legend-position-top {
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+  column-gap: 1rem;
+}
+
+/* KTUI light alert with a dotted border (the theme's is a solid 10% tint, too faint to dot): 3 classes to beat the theme's 2 */
+.kt-alert-light.kt-alert-primary.kt-alert-dotted {
+  border-style: dotted;
+  border-color: color-mix(in oklab, var(--primary) 45%, transparent);
+}
+
+/* Product color picker swatch square */
+.kt-color-swatch {
+  width: 0.875rem !important;
+  height: 0.875rem !important;
+  border-radius: 0.125rem !important;
+  border-width: 1px !important;
+  border-color: var(--border) !important;
+  flex-shrink: 0 !important;
+}
+
+/*
+ * Brand colours for the back office, matching the online shop (resources/css/shop.css): cacao brown instead of
+ * Metronic's indigo. This file loads before the theme, so the selectors are one step more specific than the theme's
+ * (`:root:root` > `:root`, `html.dark` > `.dark`, `div.kt-sidebar.dark` > `.kt-sidebar.dark`).
+ */
+:root:root {
+    --primary: #4a3426;            /* cacao */
+    --primary-foreground: #ffffff;
+    --ring: #b9a99a;
+}
+html.dark {
+    --primary: #8b6248;            /* lighter brown that still carries white text (5:1) on the dark page */
+    --primary-foreground: #ffffff;
+}
+/* The sidebar: deep brown instead of near-black; links light up in sand */
+div.kt-sidebar.dark {
+    --background: #2b1f18;
+    --foreground: #f3efea;
+    --border: #3d2c22;
+    --accent: #3a2a20;
+    --accent-foreground: #f3efea;
+    --muted-foreground: #b9a99a;
+    --primary: #d4b08c;            /* sand */
+}
+
+/* Light primary badge: the theme's is hard-coded blue (blue-100 / blue-800); here a cacao tint with dark cacao text,
+   and a dim brown with sand text in dark mode. One class more specific than the theme's, which loads after this file. */
+span.kt-badge.kt-badge-light.kt-badge-primary { background-color: #efe6dd; color: #4a3426; }
+html.dark span.kt-badge.kt-badge-light.kt-badge-primary { background-color: color-mix(in oklab, #8b6248 35%, transparent); color: #d4b08c; }
+
+/* Log out (header user menu): a soft red, so it reads as "careful" without shouting like a delete button */
+.kt-btn.btn-logout { background-color: #fdecec; color: #b42318; border: 1px solid #f9d0cd; }
+.kt-btn.btn-logout:hover { background-color: #fbdcdc; color: #912018; }
+html.dark .kt-btn.btn-logout,
+[data-kt-theme-mode="dark"] .kt-btn.btn-logout { background-color: rgb(220 38 38 / .15); color: #fca5a5; border-color: rgb(220 38 38 / .3); }
+html.dark .kt-btn.btn-logout:hover,
+[data-kt-theme-mode="dark"] .kt-btn.btn-logout:hover { background-color: rgb(220 38 38 / .25); }
+
+@import '@yaireo/tagify/dist/tagify.css';
+
+/*
+ * Tagify integration with Metronic 9 and cacao theme:
+ * Mirrors .kt-input's border, background, focus ring, and typography.
+ */
+.tagify {
+  --tags-border-color: var(--input);
+  --tags-hover-border-color: var(--input);
+  --tags-focus-border-color: var(--ring);
+  --tag-border-radius: calc(var(--radius) - 3px);
+  --tag-bg: color-mix(in oklab, var(--primary) 10%, var(--background));
+  --tag-hover: color-mix(in oklab, var(--primary) 18%, var(--background));
+  --tag-text-color: var(--foreground);
+  --tag-text-color--edit: var(--foreground);
+  --tag-pad: 0.2rem 0.5rem;
+  --tag-remove-btn-color: var(--muted-foreground);
+  --tag-remove-btn-bg--hover: var(--destructive, #e7000b);
+  --placeholder-color: var(--muted-foreground);
+  --placeholder-color-focus: var(--muted-foreground);
+
+  display: flex !important;
+  align-items: center;
+  flex-wrap: wrap;
+  width: 100%;
+  min-height: calc(var(--spacing) * 8.5); /* 34px - matches kt-input */
+  padding: 0.1875rem 0.375rem !important;
+  border-radius: calc(var(--radius) - 2px) !important;
+  border: 1px solid var(--input) !important;
+  background-color: var(--background) !important;
+  color: var(--foreground) !important;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  font-size: var(--text-sm);
+  line-height: var(--text-sm--line-height);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease !important;
+}
+
+.tagify:hover:not(.tagify--focus) {
+  border-color: color-mix(in oklab, var(--foreground) 20%, var(--input)) !important;
+}
+
+.tagify.tagify--focus {
+  border-color: var(--ring) !important;
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--ring) 30%, transparent) !important;
+  outline: none !important;
+}
+
+.tagify[aria-invalid="true"],
+.tagify.tagify--invalid {
+  border-color: var(--destructive, #e7000b) !important;
+}
+
+.tagify[aria-invalid="true"].tagify--focus {
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--destructive, #e7000b) 25%, transparent) !important;
+}
+
+.tagify__tag {
+  display: inline-flex !important;
+  align-items: center;
+  margin: 2px 4px 2px 0 !important;
+  font-size: 0.8125rem !important;
+  font-weight: 500;
+  border-radius: calc(var(--radius) - 3px) !important;
+  border: 1px solid color-mix(in oklab, var(--primary) 22%, transparent);
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.tagify__tag > div {
+  padding: 0.15rem 0.45rem !important;
+  color: var(--foreground) !important;
+}
+
+.tagify__tag > div::before {
+  border-radius: inherit !important;
+  box-shadow: 0 0 0 var(--tag-inset-shadow-size) color-mix(in oklab, var(--primary) 10%, var(--background)) inset !important;
+}
+
+.tagify__tag:hover:not([readonly]) > div::before {
+  box-shadow: 0 0 0 var(--tag-inset-shadow-size) color-mix(in oklab, var(--primary) 18%, var(--background)) inset !important;
+}
+
+.tagify__tag__removeBtn {
+  width: 14px !important;
+  height: 14px !important;
+  font-size: 13px !important;
+  line-height: 1 !important;
+  color: var(--muted-foreground) !important;
+  margin-inline: 0 4px !important;
+  border-radius: 9999px !important;
+  transition: all 0.15s ease !important;
+}
+
+.tagify__tag__removeBtn:hover {
+  background: var(--destructive, #e7000b) !important;
+  color: #ffffff !important;
+}
+
+.tagify__input {
+  margin: 2px 4px !important;
+  padding: 0.15rem 0.25rem !important;
+  font-size: var(--text-sm) !important;
+  line-height: normal !important;
+  color: var(--foreground) !important;
+  min-width: 120px !important;
+}
+
+.tagify__input::before {
+  color: var(--muted-foreground) !important;
+  line-height: inherit !important;
+}
+
+/* Dropdown */
+.tagify__dropdown {
+  --tagify-dd-color-primary: var(--primary);
+  --tagify-dd-text-color: var(--foreground);
+  --tagify-dd-bg-color: var(--background);
+  --tagify-dd-item-pad: 0.4rem 0.75rem;
+  z-index: 9999;
+  border: 1px solid var(--border) !important;
+  border-radius: calc(var(--radius) - 2px) !important;
+  background-color: var(--background) !important;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1) !important;
+  overflow: hidden;
+}
+
+.tagify__dropdown__wrapper {
+  background-color: var(--background) !important;
+  border: none !important;
+  max-height: 240px !important;
+  border-radius: inherit;
+}
+
+.tagify__dropdown__item {
+  font-size: var(--text-sm) !important;
+  color: var(--foreground) !important;
+  padding: 0.4rem 0.75rem !important;
+  border-radius: calc(var(--radius) - 4px) !important;
+  margin: 2px 4px !important;
+  transition: background-color 0.1s ease, color 0.1s ease !important;
+}
+
+.tagify__dropdown__item--active {
+  background: var(--primary) !important;
+  color: var(--primary-foreground, #ffffff) !important;
+}
+
+.tagify__dropdown__item:hover:not(.tagify__dropdown__item--active) {
+  background: color-mix(in oklab, var(--foreground) 6%, transparent) !important;
+  color: var(--foreground) !important;
+}
