@@ -13,11 +13,15 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('email')->unique();
-            $table->timestamp('email_verified_at')->nullable();
-            $table->string('password');
+            $table->string('name'); // as printed on contracts (agent, witness)
+            $table->string('username', 50)->nullable()->unique(); // signs in with this or the email, e.g. admin
+            $table->string('email')->nullable()->unique();
+            $table->string('phone', 20)->nullable(); // shown on the agent's listings and contracts
+            $table->string('password')->nullable();
             $table->rememberToken();
+            $table->timestamp('email_verified_at')->nullable();
+            $table->timestamp('last_login_at')->nullable();
+            $table->softDeletes();
             $table->timestamps();
         });
 

@@ -1,14 +1,4 @@
 ## Put your custom gitignore here ###
-/storage/framework/views/*.php
-/storage/framework/cache/*
-/storage/framework/sessions/*
-/storage/framework/testing/*
-/storage/app/mpdf
-/storage/app/private/*
-/storage/app/public/*
-!/storage/app/public/.gitignore
-!/storage/app/public/img/
-!/storage/app/public/thumb/
 /database/*.sqlite*
 .claude/
 .superpowers/
@@ -186,3 +176,7 @@ atlassian-ide-plugin.xml
 
 # Crashlytics plugin (for Android Studio and IntelliJ)
 com_crashlytics_export_strings.xml
+
+# storage/: each folder has its own .gitignore that keeps only itself (Laravel's way); the Node "logs" rule above
+# would hide storage/logs entirely
+!/storage/logs/

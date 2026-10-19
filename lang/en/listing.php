@@ -1,0 +1,26 @@
+<?php
+
+return [
+    'title' => ':title — :type for :offer in :area, Koh Phangan',
+    'sale' => 'sale',
+    'rent' => 'rent',
+    'sale_or_rent' => 'sale or rent',
+    'back' => 'All properties',
+    'for_sale' => 'For sale',
+    'for_rent' => 'For rent',
+    'per_month' => 'per month',
+    'details' => 'Details',
+    'description' => 'About this property',
+    'facilities' => 'Facilities',
+    'location' => 'Location',
+    'contact' => 'Ask about this property',
+    'agent' => 'Your agent',
+    'call' => 'Call',
+    'email' => 'Email',
+    'code' => 'Listing code',
+    'furnished' => 'Furnished',
+    'pets' => 'Pets allowed',
+    'reserved' => 'Reserved',
+    'map' => 'Map of where :title is',
+    'photo' => 'Photo :n of :title',
+];

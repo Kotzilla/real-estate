@@ -121,7 +121,7 @@
     color: #000 !important;
 }
 
-/* Table headers: very light primary tint on white so it stays lighter than the #f1ede8 page background.
+/* Table headers: very light primary tint on white so it stays lighter than the page background.
    Semibold font weight (600) gives crisp definition and visual hierarchy on the light background. */
 .kt-table thead th {
     background-color: color-mix(in oklab, var(--primary) 2%, #ffffff);
@@ -174,7 +174,7 @@ html.dark .kt-table thead th,
 
 /* Main content background: distinct light gray so white cards stand out cleanly */
 .demo1 main#content {
-    background-color: #eaedf2 !important;
+    background-color: var(--brand-page) !important;
 }
 html.dark .demo1 main#content,
 [data-kt-theme-mode="dark"] .demo1 main#content {
@@ -233,11 +233,20 @@ html.dark .demo1 main#content,
 }
 
 :root {
-    --font-sans: 'Sarabun', ui-sans-serif, system-ui, sans-serif;
+    --font-sans: 'Inter', 'Sarabun', ui-sans-serif, system-ui, sans-serif;
 }
 html,
 body {
     font-family: var(--font-sans);
+}
+
+h1,
+.h1 {
+    font-family: 'playfair-display', 'Noto Serif Thai', Georgia, serif;
+}
+html[lang="th"] h1,
+html[lang="th"] .h1 {
+    font-family: 'Noto Serif Thai', 'playfair-display', Georgia, serif;
 }
 
 /* Every scrollbar the kt-scrollable-* classes don't cover (the page itself, date picker, SweetAlert...) gets the theme's
@@ -505,34 +514,41 @@ dialog#livewire-error iframe {
 }
 
 /*
- * Brand colours for the back office, matching the online shop (resources/css/shop.css): cacao brown instead of
- * Metronic's indigo. This file loads before the theme, so the selectors are one step more specific than the theme's
- * (`:root:root` > `:root`, `html.dark` > `.dark`, `div.kt-sidebar.dark` > `.kt-sidebar.dark`).
+ * Brand colours for the back office, after islanders-properties.com: navy for actions and links, lime as the accent
+ * (the sidebar's active item, the logo dot), a near-black sidebar and a cool grey page. Lime carries dark text only —
+ * white on lime is unreadable. This file loads before the theme, so the selectors are one step more specific than the
+ * theme's (`:root:root` > `:root`, `html.dark` > `.dark`, `div.kt-sidebar.dark` > `.kt-sidebar.dark`).
  */
 :root:root {
-    --primary: #4a3426;            /* cacao */
+    --primary: #3e5083;            /* navy, white text 7:1 */
     --primary-foreground: #ffffff;
-    --ring: #b9a99a;
+    --ring: #8a99b3;
+    --brand-lime: #c1df0f;
+    --brand-dark: #12171f;
+    --brand-page: #f7f9fc;
 }
 html.dark {
-    --primary: #8b6248;            /* lighter brown that still carries white text (5:1) on the dark page */
+    --primary: #5b6fa8;            /* lighter navy that still carries white text (5:1) on the dark page */
     --primary-foreground: #ffffff;
 }
-/* The sidebar: deep brown instead of near-black; links light up in sand */
+/* The sidebar: the site's near-black with navy-grey lines; the active link lights up in lime */
 div.kt-sidebar.dark {
-    --background: #2b1f18;
-    --foreground: #f3efea;
-    --border: #3d2c22;
-    --accent: #3a2a20;
-    --accent-foreground: #f3efea;
-    --muted-foreground: #b9a99a;
-    --primary: #d4b08c;            /* sand */
+    --background: #12171f;
+    --foreground: #e8ecf3;
+    --border: #1d2a40;
+    --accent: #1d2a40;
+    --accent-foreground: #ffffff;
+    --muted-foreground: #8a99b3;
+    --primary: #c1df0f;            /* lime */
 }
 
-/* Light primary badge: the theme's is hard-coded blue (blue-100 / blue-800); here a cacao tint with dark cacao text,
-   and a dim brown with sand text in dark mode. One class more specific than the theme's, which loads after this file. */
-span.kt-badge.kt-badge-light.kt-badge-primary { background-color: #efe6dd; color: #4a3426; }
-html.dark span.kt-badge.kt-badge-light.kt-badge-primary { background-color: color-mix(in oklab, #8b6248 35%, transparent); color: #d4b08c; }
+/* Light primary badge: the theme's is hard-coded blue (blue-100 / blue-800); here a navy tint with navy text,
+   and a dim navy with light text in dark mode. One class more specific than the theme's, which loads after this file. */
+span.kt-badge.kt-badge-light.kt-badge-primary { background-color: #e6e9f2; color: #3e5083; }
+html.dark span.kt-badge.kt-badge-light.kt-badge-primary { background-color: color-mix(in oklab, #5b6fa8 35%, transparent); color: #c7d0ea; }
+
+/* Lime accent: a dot / chip in the brand's lime, always with dark text */
+.brand-lime { background-color: var(--brand-lime); color: var(--brand-dark); }
 
 /* Log out (header user menu): a soft red, so it reads as "careful" without shouting like a delete button */
 .kt-btn.btn-logout { background-color: #fdecec; color: #b42318; border: 1px solid #f9d0cd; }
@@ -545,7 +561,7 @@ html.dark .kt-btn.btn-logout:hover,
 @import '@yaireo/tagify/dist/tagify.css';
 
 /*
- * Tagify integration with Metronic 9 and cacao theme:
+ * Tagify integration with Metronic 9 and the brand theme:
  * Mirrors .kt-input's border, background, focus ring, and typography.
  */
 .tagify {
@@ -691,4 +707,213 @@ html.dark .kt-btn.btn-logout:hover,
 .tagify__dropdown__item:hover:not(.tagify__dropdown__item--active) {
   background: color-mix(in oklab, var(--foreground) 6%, transparent) !important;
   color: var(--foreground) !important;
+}
+
+/* Sign-in pages' brand panel (layouts/auth): the site's near-black with a lime glow in the corner */
+.auth-brand {
+    background: radial-gradient(circle at 85% 15%, color-mix(in oklab, var(--brand-lime) 22%, transparent), transparent 45%), var(--brand-dark);
+    color: #ffffff;
+}
+
+/*
+ * Public site (layouts/site, home): its own quiet palette, taken from the island — jungle-night ink for the header and
+ * text, granite stone for the page, paper for surfaces, one lagoon accent for what is active. Playfair Display (Noto Serif
+ * Thai) for the wordmark, headings and prices; Sarabun for the rest. Scoped to body.site so the back office keeps its own.
+ * Layout: filters | map | listings (cards two across), each scrolling on its own; the filters become a drawer below
+ * 1280px, below 1024px the map sits above the list, below 640px the cards go one across. Plain media queries: this
+ * build has no responsive utilities (see CLAUDE.md).
+ */
+body.site {
+    --ink: #17201d;
+    --stone: #eceee9;
+    --paper: #fbfbf8;
+    --lagoon: #2f6b62;
+    --mist: #6d7671;   /* secondary text on stone / paper, 4.8:1 */
+    --hairline: #d6dad3;
+    --display: 'playfair-display', 'Noto Serif Thai', Georgia, serif;
+    background: var(--stone);
+    color: var(--ink);
+}
+html[lang="th"] body.site { --display: 'Noto Serif Thai', 'playfair-display', serif; }
+.site :focus-visible { outline: 2px solid var(--lagoon); outline-offset: 2px; }
+.serif { font-family: var(--display); font-weight: 400; letter-spacing: 0; }
+.sans { font-family: var(--font-sans); }
+
+.site-header {
+    display: flex; align-items: center; justify-content: space-between; gap: 1.5rem;
+    height: 4.25rem; flex-shrink: 0; padding-inline: 1.75rem;
+    background: var(--ink); color: #e9ece7;
+}
+.site-wordmark { display: flex; align-items: center; gap: 0.75rem; color: #ffffff; }
+.site-wordmark-name { font-family: var(--display); font-size: 1.375rem; line-height: 1; }
+.site-wordmark-place { font-size: 0.75rem; line-height: 1; color: #a9b2ad; }
+.site-nav { display: flex; align-items: center; gap: 1.5rem; font-size: 0.875rem; }
+.site-nav a, .site-nav button { color: #c9cfcb; transition: color .15s; }
+.site-nav a:hover, .site-nav button:hover, .site-nav .is-current { color: #ffffff; }
+.site-nav-icon { display: inline-flex; line-height: 1; }
+.site-nav-item { display: inline-flex; align-items: center; gap: .375rem; }
+.site-nav a[lang] { display: inline-flex; align-items: center; gap: .375rem; }
+.site-flag { width: 1rem; height: 1rem; border-radius: 9999px; object-fit: cover; opacity: .6; transition: opacity .15s; }
+.site-nav a[lang]:hover .site-flag, .site-nav .is-current .site-flag { opacity: 1; }
+.site-nav-sep { width: 1px; height: 1rem; background: #3a4541; }
+
+.home-grid {
+    position: relative; display: grid; flex: 1 1 auto; min-height: 0;
+    grid-template-columns: 260px minmax(320px, 1fr) minmax(580px, 1.35fr);
+}
+.home-filters { display: flex; flex-direction: column; gap: 1.75rem; padding: 1.75rem 1.5rem; background: var(--stone); border-inline-end: 1px solid var(--hairline); }
+.home-filter { display: flex; flex-direction: column; gap: 0.625rem; }
+.home-filter-label { display: flex; align-items: center; gap: .375rem; font-size: 0.8125rem; color: var(--mist); }
+.home-filter-label .ki-filled { color: var(--lagoon); }
+.home-map { position: relative; min-height: 0; }
+.home-list { padding: 1.75rem 1.75rem 3rem; background: var(--paper); }
+.home-filters-toggle { position: absolute; top: 0.875rem; left: 0.875rem; z-index: 2; display: none; padding: 0.5rem 0.875rem; border-radius: 9999px; background: #ffffff; border: 1px solid var(--hairline); color: var(--ink); font-size: 0.8125rem; box-shadow: 0 1px 8px rgb(23 32 29 / .18); }
+
+/* Text tabs (buy / rent, bedrooms, sort): the chosen one is underlined in lagoon, nothing is boxed */
+.tabs { display: flex; flex-wrap: wrap; gap: 1.125rem; font-size: 0.875rem; }
+.tab { padding-bottom: 0.25rem; border-bottom: 2px solid transparent; color: var(--mist); transition: color .15s, border-color .15s; }
+.tab:hover { color: var(--ink); }
+.tab.is-on { color: var(--lagoon); font-weight: 600; border-color: var(--lagoon); }
+/* Type chips: hairline pills, filled in ink when picked */
+.chip { padding: 0.3rem 0.75rem; border: 1px solid var(--hairline); border-radius: 9999px; font-size: 0.8125rem; color: var(--ink); background: #ffffff; transition: background .15s, color .15s, border-color .15s; }
+.chip:hover { border-color: var(--ink); }
+.chip.is-on { background: var(--ink); border-color: var(--ink); color: #ffffff; }
+.field-line { width: 100%; min-width: 0; padding: 0.375rem 0; border: 0; border-bottom: 1px solid var(--hairline); background: transparent; font-size: 0.875rem; color: var(--ink); outline: none; }
+.field-line:focus { border-color: var(--lagoon); }
+.field-box { width: 100%; min-width: 0; padding: 0.5rem 0.625rem; border: 1px solid var(--hairline); border-radius: 0.375rem; background: #ffffff; font-size: 0.875rem; color: var(--ink); outline: none; font-variant-numeric: tabular-nums; }
+.field-box:focus { border-color: var(--lagoon); }
+
+/* The price filter's min / max slider: two range inputs stacked, only their handles take the pointer */
+.price-slider { position: relative; height: 1.25rem; margin-top: 0.75rem; }
+.price-slider::before { content: ''; position: absolute; inset: 50% 0 auto; height: 3px; margin-top: -1.5px; border-radius: 9999px;
+  background: linear-gradient(to right, var(--hairline) var(--lo), var(--lagoon) var(--lo) var(--hi), var(--hairline) var(--hi)); }
+.price-slider input { position: absolute; inset: 0; width: 100%; margin: 0; background: none; pointer-events: none; -webkit-appearance: none; appearance: none; }
+.price-slider input::-webkit-slider-thumb { -webkit-appearance: none; pointer-events: auto; width: 1rem; height: 1rem; border-radius: 9999px; background: #ffffff; border: 2px solid var(--lagoon); cursor: grab; }
+.price-slider input::-moz-range-thumb { pointer-events: auto; width: 1rem; height: 1rem; border-radius: 9999px; background: #ffffff; border: 2px solid var(--lagoon); cursor: grab; }
+.price-slider input::-moz-range-track { background: none; }
+.price-slider input:focus-visible::-webkit-slider-thumb { box-shadow: 0 0 0 3px rgb(47 107 98 / .25); }
+.check-line { display: flex; align-items: center; gap: 0.625rem; font-size: 0.875rem; color: var(--ink); cursor: pointer; }
+.check-line input { accent-color: var(--lagoon); }
+.check-line .count { margin-inline-start: auto; font-size: 0.75rem; color: var(--mist); }
+.link-quiet { font-size: 0.8125rem; color: var(--mist); text-decoration: underline; text-underline-offset: 3px; }
+.link-quiet:disabled { opacity: .4; text-decoration: none; cursor: default; }
+
+/* Listing cards: white cards with photo on top, name, meta/facts, and price at bottom */
+.home-cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.75rem 1.5rem; }
+.home-cards-empty { grid-column: 1 / -1; }
+.home-card {
+    display: flex; flex-direction: column;
+    background: #ffffff;
+    border: 1px solid var(--hairline);
+    border-radius: 8px;
+    overflow: hidden;
+    cursor: pointer;
+    box-shadow: 0 1px 3px rgba(23, 32, 29, 0.04);
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+.home-card:hover {
+    box-shadow: 0 6px 18px rgba(23, 32, 29, 0.08);
+    border-color: #c4cac2;
+}
+.home-card.is-active {
+    border-color: var(--lagoon);
+    box-shadow: 0 6px 18px rgba(47, 107, 98, 0.15);
+}
+.home-card-photo { position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; aspect-ratio: 4 / 3; background: var(--stone); }
+.home-card-photo img { width: 100%; height: 100%; object-fit: cover; transition: transform .6s ease; }
+.home-card:hover .home-card-photo img, .home-card.is-active .home-card-photo img { transform: scale(1.03); }
+.home-card-body { display: flex; flex-direction: column; flex: 1 1 auto; padding: 1rem 1.125rem 1.125rem; gap: 0.25rem; }
+.home-card-title { font-size: 1rem; font-weight: 600; color: var(--ink); line-height: 1.35; }
+.home-card.is-active .home-card-title { text-decoration: underline; text-decoration-color: var(--lagoon); text-underline-offset: 4px; }
+.home-card-meta { font-size: 0.8125rem; color: var(--mist); }
+.home-card-features { display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem 1rem; margin-top: 0.25rem; padding-top: 0.5rem; border-top: 1px solid var(--hairline); font-size: 0.8125rem; color: var(--mist); }
+.home-card-feature { display: inline-flex; align-items: center; gap: 0.375rem; white-space: nowrap; }
+.home-card-feature i { font-size: 0.9375rem; color: var(--lagoon); }
+.home-card-price { margin-top: auto; padding-top: 0.625rem; font-family: var(--font-sans); font-weight: 600; font-size: 1.375rem; line-height: 1.2; color: var(--ink); }
+.home-card-price small { font-family: var(--font-sans); font-weight: 400; font-size: 0.8125rem; color: var(--mist); }
+.home-card-footer { display: flex; align-items: flex-end; justify-content: space-between; gap: .75rem; margin-top: auto; padding-top: 0.625rem; }
+.home-card-footer .home-card-price { margin-top: 0; padding-top: 0; }
+.home-card-link { display: inline-flex; flex-shrink: 0; align-items: center; justify-content: center; width: 2.25rem; height: 2.25rem; border-radius: 9999px; border: 1px solid var(--hairline); color: var(--lagoon); font-size: 1.125rem; transition: background .15s, color .15s, border-color .15s; }
+.home-card-link:hover, .home-card.is-active .home-card-link { background: var(--lagoon); border-color: var(--lagoon); color: #ffffff; }
+
+/* A listing's page (listing.blade.php): photos in a grid, then the facts beside a price / contact box that stays put */
+.listing { max-width: 1180px; margin: 0 auto; padding: 1.5rem 1.75rem 4rem; }
+.listing-back { display: inline-flex; align-items: center; gap: .375rem; font-size: 0.875rem; color: var(--mist); }
+.listing-back:hover { color: var(--ink); }
+.listing-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; margin: 1rem 0 1.25rem; }
+.listing-title { font-family: var(--display); font-size: 2.25rem; line-height: 1.15; font-weight: 400; }
+.listing-meta { display: flex; align-items: center; gap: .375rem; margin-top: .375rem; color: var(--mist); }
+.listing-flag { padding: .25rem .75rem; border-radius: 9999px; background: var(--ink); color: #ffffff; font-size: 0.8125rem; white-space: nowrap; }
+.listing-gallery { display: grid; grid-template-columns: 2fr 1fr 1fr; grid-template-rows: repeat(2, 12rem); gap: .5rem; border-radius: 8px; overflow: hidden; }
+.listing-gallery img { width: 100%; height: 100%; object-fit: cover; background: var(--paper); }
+.listing-gallery img:first-child { grid-row: span 2; }
+.listing-gallery img:only-child { grid-column: 1 / -1; }
+.listing-body { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 2.5rem; margin-top: 2rem; align-items: start; }
+.listing-section + .listing-section { margin-top: 2rem; padding-top: 2rem; border-top: 1px solid var(--hairline); }
+.listing-h2 { display: flex; align-items: center; gap: .5rem; margin-bottom: 1rem; font-size: 1.125rem; font-weight: 600; }
+.listing-h2 i { color: var(--lagoon); }
+.listing-facts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .75rem 1.5rem; }
+.listing-facts li { display: flex; align-items: center; gap: .5rem; }
+.listing-facts i { color: var(--lagoon); }
+.listing-text { line-height: 1.75; color: #36403c; }
+.listing-facilities { display: flex; flex-wrap: wrap; gap: .5rem; }
+.listing-facilities li { display: inline-flex; align-items: center; gap: .375rem; padding: .3rem .75rem; border: 1px solid var(--hairline); border-radius: 9999px; background: #ffffff; font-size: 0.8125rem; }
+.listing-facilities i { color: var(--lagoon); }
+.listing-map { display: block; overflow: hidden; border-radius: 8px; border: 1px solid var(--hairline); background: var(--paper); }
+.listing-map img { width: 100%; aspect-ratio: 2 / 1; object-fit: cover; }
+.listing-map span { display: block; padding: 2rem; text-align: center; color: var(--mist); }
+.listing-aside { position: sticky; top: 1.5rem; display: flex; flex-direction: column; gap: 1rem; }
+.listing-box { padding: 1.5rem; border: 1px solid var(--hairline); border-radius: 8px; background: #ffffff; }
+.listing-offer { font-size: 0.8125rem; color: var(--mist); }
+.listing-offer:not(:first-child) { margin-top: .875rem; }
+.listing-price { font-size: 1.75rem; font-weight: 600; line-height: 1.2; }
+.listing-price small { font-size: 0.875rem; font-weight: 400; color: var(--mist); }
+.listing-code { margin-top: 1rem; padding-top: .875rem; border-top: 1px solid var(--hairline); font-size: 0.8125rem; color: var(--mist); }
+.listing-agent { margin-bottom: 1rem; font-weight: 600; }
+.listing-agent small { display: block; font-weight: 400; font-size: 0.8125rem; color: var(--mist); }
+.listing-button { display: flex; align-items: center; justify-content: center; gap: .5rem; padding: .625rem 1rem; border-radius: 6px; background: var(--lagoon); color: #ffffff; font-size: 0.875rem; font-weight: 500; }
+.listing-button:hover { background: #255850; }
+.listing-button.is-quiet { background: #ffffff; color: var(--ink); border: 1px solid var(--hairline); }
+.listing-button.is-quiet:hover { border-color: var(--ink); }
+
+/* Price pins: ink for sale, paper for rent, lagoon when its card is hovered */
+.map-pin {
+    padding: 0.25rem 0.625rem; border: 1px solid var(--ink); border-radius: 9999px; cursor: pointer;
+    font: 500 12px/1.35 var(--font-sans); white-space: nowrap;
+    background: var(--ink); color: #ffffff; box-shadow: 0 1px 4px rgb(23 32 29 / .25);
+    transition: transform .12s, background .12s;
+}
+.map-pin.is-rent { background: var(--paper); color: var(--ink); }
+.map-pin.is-active { z-index: 5; transform: scale(1.12); background: var(--lagoon); border-color: var(--lagoon); color: #ffffff; }
+
+@media (prefers-reduced-motion: reduce) {
+    .home-card-photo img, .map-pin, .home-filters { transition: none; }
+}
+@media (max-width: 1279.98px) {
+    .home-grid { grid-template-columns: minmax(280px, 1fr) minmax(520px, 1.3fr); }
+    .home-filters { position: absolute; inset: 0 auto 0 0; z-index: 10; width: 280px; box-shadow: 0 0 30px rgb(23 32 29 / .2); transform: translateX(-100%); transition: transform .2s; }
+    .home-grid.filters-open .home-filters { transform: none; }
+    .home-filters-toggle { display: inline-flex; gap: 0.375rem; align-items: center; }
+}
+@media (max-width: 1023.98px) {
+    .home-grid { display: flex; flex-direction: column; overflow-y: auto; }
+    .home-map { height: 45vh; flex-shrink: 0; }
+    .home-list { overflow: visible; }
+    .home-filters { position: fixed; top: 4.25rem; }
+    .site-header { padding-inline: 1rem; }
+    .site-wordmark-place { display: none; }
+}
+@media (max-width: 1023.98px) {
+    .listing { padding-inline: 1rem; }
+    .listing-body { grid-template-columns: minmax(0, 1fr); }
+    .listing-aside { position: static; }
+}
+@media (max-width: 639.98px) {
+    .home-cards { grid-template-columns: minmax(0, 1fr); }
+    .listing-title { font-size: 1.75rem; }
+    .listing-gallery { grid-template-columns: 1fr 1fr; grid-template-rows: 14rem 7rem; }
+    .listing-gallery img:first-child { grid-row: auto; grid-column: 1 / -1; }
+    .listing-gallery img:nth-child(n+4) { display: none; }
+    .listing-facts { grid-template-columns: minmax(0, 1fr); }
+    .site-nav { gap: 1rem; }
 }

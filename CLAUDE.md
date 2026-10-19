@@ -2,22 +2,29 @@
 
 ## Project Overview
 
-Real Estate is a Laravel back office for a property business. **The domain is not defined yet** — the project is a bare Laravel 12 skeleton plus the Metronic 9 theme assets, copied from `~/Sites/store`; features are implemented later. When scope is unclear, default to the simplest version that covers the workflow.
+Real Estate is the back office of an agency selling and letting property in **Southern Thailand** (the 14 southern provinces). The flow is findnest's (`~/Sites/findnest`): an **owner** lists a **property** (for sale, for rent or both, with photos and facilities), an agent finds a **customer**, and the deal becomes a **contract** — a lease or an agreement to sell and purchase — printed in English or Thai. Signing a contract marks the property rented / sold. The structure, layout, users, permissions and activity log are store's (`~/Sites/store`). The site covers **Koh Phangan only** (`Property::HOME_DISTRICT`, Ko Pha-ngan district); the public home page `/` is a three-column map search (filters | Mapbox map | listings), `HomeController` + `resources/js/home.js` (Alpine `propertyMap`, filtered in the browser). Map keys: `MAPBOX_TOKEN`, `GOOGLE_MAP_API` (`config/services.php`). When scope is unclear, default to the simplest version that covers the workflow.
 
-Conventions below come from `~/Sites/store` and apply once the matching pieces (Livewire, ACL, layouts…) are added. Anything marked *(planned)* is not installed yet — add the package when the first feature needs it, don't add packages for things a few lines of Laravel can do.
+Don't add packages for things a few lines of Laravel can do.
+
+## Domain
+
+- `Property` (code `PHU-0001` from the province) → `owner` (a `Person`), `agent` (a `User`), `province` / `district` (seeded from `database/data/south.json`), photos (`HasPhotos`), facilities (spatie tags, type `Property::FACILITY`). The form picks a district; the province comes from it.
+- `Person` — `PersonType` owner / customer / outside agent. Names, address kept in English **and** Thai: the contract copies print their own language (`fullName($lang)`, falls back to English). Owners carry the bank account the rent goes to.
+- `Contract` (code `RE-2026-0001`) — `ContractType` rent / sale, `ContractStatus` draft / active / completed / cancelled. The commission is worked out on save (`calculate()`: rent × months or sale price, × %), and status changes move the property (`syncPropertyStatus()`). A lease's end date defaults to start + months − 1 day. Printed by `contracts/print` → `contracts/print/{rent,sale}-{en,th}.blade.php`; the lease clauses' figures are constants on `Contract`. Thai copies use the Buddhist year (`Contract::dateIn`) and amounts in words (`Contract::inWords`).
+- Dev data: `DemoSeeder` (not in production). 60 mock Koh Phangan listings (24 hand-written, 36 random) with Unsplash beach / villa photos (`DemoSeeder::PHOTOS`) (skipped offline and in tests). Sign in `admin` / `letmein`, agent `napat` / `letmein`.
 
 ## Tech Stack
 
 - **PHP** 8.2+ (dev machine runs 8.5), **Laravel 12**
 - **Database**: SQLite for host/tests (`database/database.sqlite`); Docker dev environment (`APP_PORT=8082`, MySQL forwarded on `3312`, database `real_estate`, user `homestead` / `secret`) runs MySQL (`real-estate-mysql-1`). **Whenever adding migrations, always run `docker exec real-estate-app-1 php artisan migrate --force` as well as host `php artisan migrate` so MySQL stays in sync.** phpMyAdmin is the shared one at http://localhost:8090 (server `real-estate`, see `~/Sites/phpmyadmin`).
-- **Frontend**: Blade + Metronic 9 theme (KTUI components, `kt-*` classes, Keenicons `ki-*`); Livewire 3 *(planned)*
+- **Frontend**: Blade + Metronic 9 theme (KTUI components, `kt-*` classes, Keenicons `ki-*`); Livewire 3
   - Theme CSS/JS is in `public/assets/` (committed). `styles.css` is already a **Tailwind 4** build, so no Tailwind 3 anywhere.
   - `resources/css/app.css` is a utilities-only Tailwind 4 build (no preflight/theme) that fills gaps — the prebuilt theme only has utilities its demos used. Use theme classes first; if a plain utility has no effect, it's probably missing from the prebuilt CSS and this build covers it after `npm run build`. **Responsive gotcha**: our stylesheet loads *before* the theme's `styles.css` on purpose (the theme wins), and both are in the same cascade layer, so a responsive class from this build loses to a plain theme utility for the same property, and this build generates no `sm:/md:/lg:` classes at all. Only responsive classes the theme already ships work; for anything else write a small custom class in `app.css`. After adding a class, check it is in `public/build/assets/app-*.css`.
   - **Scroll containers use the theme's classes**, never plain `overflow-*-auto`: `kt-scrollable-x-auto`, `kt-scrollable-y-auto`, `kt-scrollable-auto`.
   - **No Tailwind `dark:` variant for colours**: in Tailwind 4 it follows the OS, not the app's theme. Write a small class in `app.css` with an `html.dark` / `[data-kt-theme-mode="dark"]` override instead.
   - Font: **Sarabun** (English + Thai), woff2 in `resources/fonts/` (`@font-face` in `resources/css/app.css`).
-  - Assets: root-relative `{{ asset('assets/...') }}` paths. `public/build` is git-ignored — run `npm run build` on deploy.
-  - Note: `app.css` was copied from store and still carries the store's cacao brown overrides and shop-specific classes; trim or re-theme them when the brand is decided. The `vite.config.js` is stock (`app.css` + `app.js`).
+  - Assets: root-relative `{{ asset('assets/...') }}` paths. `public/build` is git-ignored — run `npm run build` on deploy. `public/storage` must be a **relative** link (`ln -s ../storage/app/public public/storage`) so it works inside Docker too.
+  - **Brand colours** (after islanders-properties.com): navy `--primary` #3e5083, lime accent `--brand-lime` #c1df0f (dark text only — `.brand-lime`), near-black sidebar #12171f, page #f7f9fc; all in the brand block of `app.css`. `app.css` still carries some of store's shop-specific classes (pay dots, dashboard helpers); trim them when they get in the way. The `vite.config.js` is stock (`app.css` + `app.js`).
 - **Testing**: PHPUnit (`composer test`)
 
 ## Conventions
@@ -33,7 +40,7 @@ Conventions below come from `~/Sites/store` and apply once the matching pieces (
   7. `timestamps()`, always last
   8. table-level indexes / constraints
 - **Enums** for status/type fields, in `app/Enums/` only — never a stub in `app/`.
-- **ACL: spatie/laravel-permission** *(planned)*. Roles and permissions live in its tables, not a `users.role` column. Check permissions (`$user->can('module.action')`, `@can`), not role names. Policies wrap the permission checks per model; never check roles inline in controllers or views.
+- **ACL: spatie/laravel-permission**. Roles: `App\Enums\UserRole` (admin, manager, agent); permissions and their default roles: `PermissionSeeder::DEFAULTS` (`properties.*`, `people.*`, `contracts.*`, `settings.manage`, `activity.view`), changed afterwards on the Permissions page. Roles and permissions live in its tables, not a `users.role` column. Check permissions (`$user->can('module.action')`, `@can`), not role names. Policies wrap the permission checks per model; never check roles inline in controllers or views.
 - **Form Requests** for validation; keep controllers thin.
 - Follow `.editorconfig` (4 spaces PHP, 2 spaces for js/css/json/yaml/blade.php, LF).
 - Match the surrounding code's style.
@@ -41,7 +48,9 @@ Conventions below come from `~/Sites/store` and apply once the matching pieces (
   - Class: a title line (`Order Controller`), an optional description, then `@SuppressWarnings(...)` lines, then `@package App\Layer` last. Controllers use `@package App\Controllers`; everything else its real layer (`App\Models`, `App\Livewire`, `App\Policies`, `App\Enums`, `App\Notifications`, `App\Providers`, `App\Traits`, `App\Console\Commands`).
   - Method: a one-line description (no trailing period), a blank line, `@param  Type  $name` for each parameter (two spaces), and `@return Type` (`void` included; none on constructors). Class-level methods only, not closures. Put the docblock above any `#[Attribute]` lines.
 - **PHPMD**: run `phpmd app text phpmd.xml` after touching PHP. Fix real findings (e.g. `MissingImport`: add the `use`). Warnings that are inherent to Laravel — `StaticAccess`, `UnusedFormalParameter`, `ElseExpression`, `CamelCasePropertyName` — are suppressed **once at class level** in the class docblock (`@SuppressWarnings(PHPMD.StaticAccess)`), never per method or inline.
-- **Back office under `/backend`** (once there is a public site): pages behind `auth`, route names start with `backend.`.
+- **Back office under `/backend`**: pages behind `auth`, route names start with `backend.`.
+- **Activity log** (spatie/laravel-activitylog): call `$this->log($model, 'property-update')` (`App\Traits\LogActivity`) after a change; add the code's label to `lang/*/activity.php`.
+- **Morph map is enforced** (`AppServiceProvider`): a new model that gets photos, tags or log entries needs its alias there.
 
 ## Browser Checks
 
@@ -57,14 +66,14 @@ Don't suggest or offer to check in Chrome either — no "want me to verify it in
 - Indent content inside `@if`, `@foreach`, `@forelse`, `@for`, `@while` one level deeper than the directive.
 - **Every view must keep its tags balanced.** One `</div>` too many makes the browser pop `<main>` and `.kt-wrapper`, so the footer is squeezed beside the content on a **full load** (a Livewire re-render repairs it). Check the `<div` / `</div>` count for a view you add or re-indent; a feature test that counts them per page is the cheap guard.
 
-## Livewire *(planned)*
+## Livewire
 
 - Use `@livewire('name')` directives, not `<livewire:name />`. Authorize in `render()` (mount runs once). Don't use `wire:navigate` — KTUI components would need re-initialising after each navigation.
 - **Drawers**: one Livewire component per drawer, opened by a browser event; Livewire shows/hides it, never KTUI's drawer JS.
 
 ## Form widgets
 
-Never a plain browser widget: no bare `<select>`, no `<input type="date">`. The Alpine helpers (`ktSelect`, `datePicker`, `limitedTextarea`…) live in `resources/js/app.js` in `~/Sites/store` and are **not copied yet** — port them from there when the first form needs them.
+Never a plain browser widget: no bare `<select>`, no `<input type="date">`. The Alpine helpers (`ktSelect`, `datePicker`, `tagInput`, `limitedTextarea`…) are in `resources/js/app.js` (from store). `<x-field>` is a label + control + hint + error: `type` text / number / date (datePicker) / textarea, or a slot for a select.
 
 - **Dropdown → KTUI select** via `ktSelect`. **Date → flatpickr** via `datePicker` (value stays `Y-m-d`). **Textarea → `kt-textarea auto-size`** with a `maxlength` and the same `max:` in the request.
 - **Badges are light**: `kt-badge-light kt-badge-{success|warning|info|destructive|primary|secondary}`, never the solid colour.
@@ -92,4 +101,4 @@ docker compose up -d  # app on :8082, MySQL on :3312
 
 ## Project Structure
 
-Standard Laravel 12 layout. Add directories only when a real need appears (e.g. `app/Enums/`, `app/Policies/`).
+Standard Laravel 12 layout. Pages: a thin controller per module (`PropertyController`, `PersonController`, `ContractController`, `DashboardController`) with a `FormRequest`; each list is a Livewire table (`app/Livewire/{Properties,People,Contracts}/Table.php`). Users, permissions and the activity log are Livewire pages copied from store.

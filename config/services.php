@@ -28,6 +28,16 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    // The public map (home page): Mapbox draws it; the Google key is kept for Street View / place search later.
+    // Both are browser keys: restrict them to this site's URLs in their dashboards.
+    'mapbox' => [
+        'token' => env('MAPBOX_TOKEN'),
+    ],
+
+    'google' => [
+        'maps_key' => env('GOOGLE_MAP_API'),
+    ],
+
     'slack' => [
         'notifications' => [
             'bot_user_oauth_token' => env('SLACK_BOT_USER_OAUTH_TOKEN'),
