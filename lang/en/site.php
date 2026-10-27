@@ -27,7 +27,6 @@ return [
     'contact_text' => 'Thinking of buying, renting or listing your property? Talk to us, we usually answer the same day.',
     'call' => 'Call us',
     'line' => 'LINE',
-    'whatsapp' => 'WhatsApp',
     'email' => 'Email',
     'office' => 'Our office',
     'hours' => 'Opening hours',

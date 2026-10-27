@@ -145,9 +145,6 @@
           <a href="https://line.me/R/ti/p/{{ rawurlencode($site['line']) }}" target="_blank" rel="noopener" class="landing-contact-item">
             <i class="ki-filled ki-message-text"></i><span><small>@lang('site.line')</small>{{ $site['line'] }}</span>
           </a>
-          <a href="https://wa.me/{{ $site['whatsapp'] }}" target="_blank" rel="noopener" class="landing-contact-item">
-            <i class="ki-filled ki-whatsapp"></i><span><small>@lang('site.whatsapp')</small>{{ $site['phone'] }}</span>
-          </a>
           <a href="mailto:{{ $site['email'] }}" class="landing-contact-item">
             <i class="ki-filled ki-sms"></i><span><small>@lang('site.email')</small>{{ $site['email'] }}</span>
           </a>

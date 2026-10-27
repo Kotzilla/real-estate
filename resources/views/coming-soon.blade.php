@@ -47,7 +47,6 @@
       <div class="landing-actions">
         <a href="tel:{{ preg_replace('/[^+\d]/', '', $site['phone']) }}" class="landing-button"><i class="ki-filled ki-phone"></i> {{ $site['phone'] }}</a>
         <a href="mailto:{{ $site['email'] }}" class="landing-button"><i class="ki-filled ki-sms"></i> {{ $site['email'] }}</a>
-        <a href="https://wa.me/{{ $site['whatsapp'] }}" class="landing-button" target="_blank" rel="noopener"><i class="ki-filled ki-whatsapp"></i> @lang('site.whatsapp')</a>
       </div>
     </div>
   </main>

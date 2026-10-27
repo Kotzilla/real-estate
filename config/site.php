@@ -8,7 +8,6 @@ return [
     'phone' => '080-033-1131',
     'email' => 'wanlapanachiangmai@gmail.com',
     'line' => '@firstrealestate',
-    'whatsapp' => '66800331131', // digits only, for wa.me
     'address' => '44/12 Moo 1, Thong Sala, Koh Phangan, Surat Thani 84280',
     'address_th' => '44/12 หมู่ 1 ต.เกาะพะงัน อ.เกาะพะงัน จ.สุราษฎร์ธานี 84280',
     'hours' => ['en' => 'Mon – Sat, 9:00 – 18:00', 'th' => 'จันทร์ – เสาร์ 9:00 – 18:00'],
