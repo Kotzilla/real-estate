@@ -3,6 +3,8 @@
 // The agency's public details: the home page's "Contact us", the footer and the privacy policy.
 // ponytail: dummy values for now; set the real ones here (or move them to .env) before going live.
 return [
+    // The public site shows the coming-soon page (signed-in staff excepted): on in production until COMING_SOON=false
+    'coming_soon' => (bool) env('COMING_SOON', env('APP_ENV') === 'production'),
     'phone' => '+66 80 000 0000',
     'email' => 'hello@first-realestate.example',
     'line' => '@firstrealestate',

@@ -9,6 +9,7 @@ use App\Http\Controllers\ListingController;
 use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\PersonController;
 use App\Http\Controllers\PropertyController;
+use App\Http\Middleware\ComingSoon;
 use App\Models\Contract;
 use App\Models\Person;
 use App\Models\Property;
@@ -16,10 +17,12 @@ use App\Models\User;
 use Illuminate\Support\Facades\Route;
 use Spatie\Activitylog\Models\Activity;
 
-// Public site: the landing page, the map search, a listing's page, the privacy policy
-Route::get('/', HomeController::class)->name('home');
-Route::get('/properties', [ListingController::class, 'index'])->name('listings');
-Route::get('/property/{code}/{slug?}', [ListingController::class, 'show'])->where('code', '[A-Z]{3}-[0-9]+')->name('listing');
+// Public site: the landing page, the map search, a listing's page (the coming-soon page instead until launch), the privacy policy
+Route::middleware(ComingSoon::class)->group(function () {
+    Route::get('/', HomeController::class)->name('home');
+    Route::get('/properties', [ListingController::class, 'index'])->name('listings');
+    Route::get('/property/{code}/{slug?}', [ListingController::class, 'show'])->where('code', '[A-Z]{3}-[0-9]+')->name('listing');
+});
 Route::view('/privacy', 'privacy')->name('privacy');
 Route::redirect('/login', '/backend/login');
 Route::get('/lang/{locale}', [LocaleController::class, 'switch'])->name('lang.switch');

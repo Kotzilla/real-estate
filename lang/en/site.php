@@ -37,4 +37,7 @@ return [
     'explore' => 'Explore',
     'contact' => 'Contact',
     'follow' => 'Follow us',
+    'soon_badge' => 'Coming soon',
+    'soon_title' => 'Our new website is on its way',
+    'soon_text' => 'We are putting the finishing touches on a new home for Koh Phangan villas, houses, condos and land. Until then, call, email or message us and we will help you find your place on the island.',
 ];
