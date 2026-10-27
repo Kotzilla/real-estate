@@ -1,0 +1,46 @@
+{
+  "resources/css/app.css": {
+    "file": "assets/app-CsGlMck7.css",
+    "src": "resources/css/app.css",
+    "isEntry": true,
+    "name": "app",
+    "names": [
+      "app.css"
+    ]
+  },
+  "resources/fonts/Sarabun-Bold.woff2": {
+    "file": "assets/Sarabun-Bold-Cvw08IqL.woff2",
+    "src": "resources/fonts/Sarabun-Bold.woff2"
+  },
+  "resources/fonts/Sarabun-Light.woff2": {
+    "file": "assets/Sarabun-Light-BxzkXTQO.woff2",
+    "src": "resources/fonts/Sarabun-Light.woff2"
+  },
+  "resources/fonts/Sarabun-Medium.woff2": {
+    "file": "assets/Sarabun-Medium-CEXTB1Jr.woff2",
+    "src": "resources/fonts/Sarabun-Medium.woff2"
+  },
+  "resources/fonts/Sarabun-Regular.woff2": {
+    "file": "assets/Sarabun-Regular-B9ju_nKZ.woff2",
+    "src": "resources/fonts/Sarabun-Regular.woff2"
+  },
+  "resources/fonts/Sarabun-SemiBold.woff2": {
+    "file": "assets/Sarabun-SemiBold-a_JJ1ZnT.woff2",
+    "src": "resources/fonts/Sarabun-SemiBold.woff2"
+  },
+  "resources/js/app.js": {
+    "file": "assets/app-CWWyqwRy.js",
+    "name": "app",
+    "src": "resources/js/app.js",
+    "isEntry": true,
+    "css": [
+      "assets/app-B26ENHr1.css"
+    ]
+  },
+  "resources/js/home.js": {
+    "file": "assets/home-C2cPyg_k.js",
+    "name": "home",
+    "src": "resources/js/home.js",
+    "isEntry": true
+  }
+}

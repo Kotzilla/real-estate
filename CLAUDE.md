@@ -23,7 +23,7 @@ Don't add packages for things a few lines of Laravel can do.
   - **Scroll containers use the theme's classes**, never plain `overflow-*-auto`: `kt-scrollable-x-auto`, `kt-scrollable-y-auto`, `kt-scrollable-auto`.
   - **No Tailwind `dark:` variant for colours**: in Tailwind 4 it follows the OS, not the app's theme. Write a small class in `app.css` with an `html.dark` / `[data-kt-theme-mode="dark"]` override instead.
   - Font: **Sarabun** (English + Thai), woff2 in `resources/fonts/` (`@font-face` in `resources/css/app.css`).
-  - Assets: root-relative `{{ asset('assets/...') }}` paths. `public/build` is git-ignored — run `npm run build` on deploy. `public/storage` must be a **relative** link (`ln -s ../storage/app/public public/storage`) so it works inside Docker too.
+  - Assets: root-relative `{{ asset('assets/...') }}` paths. `public/build` is committed (the live server has no Node and deploys by `git pull`): run `npm run build` and commit it with any CSS/JS change. `public/storage` must be a **relative** link (`ln -s ../storage/app/public public/storage`) so it works inside Docker too.
   - **Brand colours** (after islanders-properties.com): navy `--primary` #3e5083, lime accent `--brand-lime` #c1df0f (dark text only — `.brand-lime`), near-black sidebar #12171f, page #f7f9fc; all in the brand block of `app.css`. `app.css` still carries some of store's shop-specific classes (pay dots, dashboard helpers); trim them when they get in the way. The `vite.config.js` is stock (`app.css` + `app.js`).
 - **Testing**: PHPUnit (`composer test`)
 

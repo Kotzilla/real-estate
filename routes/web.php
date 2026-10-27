@@ -17,13 +17,13 @@ use App\Models\User;
 use Illuminate\Support\Facades\Route;
 use Spatie\Activitylog\Models\Activity;
 
-// Public site: the landing page, the map search, a listing's page (the coming-soon page instead until launch), the privacy policy
+// Public site: the landing page, the map search, a listing's page, the privacy policy (the coming-soon page instead until launch)
 Route::middleware(ComingSoon::class)->group(function () {
     Route::get('/', HomeController::class)->name('home');
     Route::get('/properties', [ListingController::class, 'index'])->name('listings');
     Route::get('/property/{code}/{slug?}', [ListingController::class, 'show'])->where('code', '[A-Z]{3}-[0-9]+')->name('listing');
+    Route::view('/privacy', 'privacy')->name('privacy');
 });
-Route::view('/privacy', 'privacy')->name('privacy');
 Route::redirect('/login', '/backend/login');
 Route::get('/lang/{locale}', [LocaleController::class, 'switch'])->name('lang.switch');
 

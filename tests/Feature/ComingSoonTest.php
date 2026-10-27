@@ -14,11 +14,11 @@ class ComingSoonTest extends TestCase
     {
         config(['site.coming_soon' => true]);
 
-        foreach (['/', '/properties', '/property/PHU-0001'] as $url) {
+        foreach (['/', '/properties', '/property/PHU-0001', '/privacy'] as $url) {
             $html = $this->get($url)->assertOk()->assertSee(__('site.soon_title'))->getContent();
             $this->assertSame(substr_count($html, '<div'), substr_count($html, '</div>'));
+            $this->assertStringNotContainsString(route('privacy'), $html);
         }
-        $this->get('/privacy')->assertOk()->assertDontSee(__('site.soon_title'));
         $this->get('/backend/login')->assertOk()->assertDontSee(__('site.soon_title'));
     }
 
