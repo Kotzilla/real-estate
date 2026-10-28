@@ -720,7 +720,7 @@ html.dark .kt-btn.btn-logout:hover,
  * text, granite stone for the page, paper for surfaces, one lagoon accent for what is active. Playfair Display (Noto Serif
  * Thai) for the wordmark, headings and prices; Sarabun for the rest. Scoped to body.site so the back office keeps its own.
  * Layout: filters | map | listings (cards two across), each scrolling on its own; the filters become a drawer below
- * 1280px, below 1024px the map sits above the list, below 640px the cards go one across. Plain media queries: this
+ * 1280px, below 1024px the map sits above the list and the header menu folds behind a burger, below 640px the cards go one across. Plain media queries: this
  * build has no responsive utilities (see CLAUDE.md).
  */
 body.site {
@@ -756,6 +756,12 @@ html[lang="th"] body.site { --display: 'Noto Serif Thai', 'playfair-display', se
 .site-flag { width: 1rem; height: 1rem; border-radius: 9999px; object-fit: cover; opacity: .6; transition: opacity .15s; }
 .site-nav a[lang]:hover .site-flag, .site-nav .is-current .site-flag { opacity: 1; }
 .site-nav-sep { width: 1px; height: 1rem; background: #3a4541; }
+/* Below 1024px the menu folds behind a burger and drops down under the header (Alpine `menuOpen` in layouts/site) */
+.site-burger { display: none; align-items: center; justify-content: center; width: 2.75rem; height: 2.75rem; margin-inline-end: -.5rem; border-radius: 6px; color: #e9ece7; font-size: 1.5rem; }
+.site-burger:hover { color: var(--brand-lime); }
+.home-filters-close { display: none; align-items: center; justify-content: center; width: 2.25rem; height: 2.25rem; margin-inline-end: -.5rem; color: var(--mist); font-size: 1.125rem; }
+.home-filters-close:hover { color: var(--ink); }
+.home-filters-backdrop { display: none; }
 
 .home-grid {
     position: relative; display: grid; flex: 1 1 auto; min-height: 0;
@@ -889,7 +895,7 @@ html[lang="th"] body.site { --display: 'Noto Serif Thai', 'playfair-display', se
 .landing-title { max-width: 40rem; font-family: var(--display); font-size: 3.25rem; line-height: 1.1; font-weight: 400; color: #ffd65a; text-shadow: 0 2px 4px rgb(0 0 0 / .45), 0 4px 24px rgb(0 0 0 / .35); }
 .landing-lead { max-width: 34rem; margin-top: 1rem; font-size: 1.125rem; color: #ffffff; text-shadow: 0 1px 3px rgb(0 0 0 / .6), 0 2px 16px rgb(0 0 0 / .4); }
 .landing-actions { display: flex; flex-wrap: wrap; gap: .75rem; margin-top: 2rem; }
-.landing-button { display: inline-flex; align-items: center; gap: .5rem; padding: .875rem 1.25rem; border-radius: 6px; background: #ffffff; color: var(--ink); font-weight: 600; transition: background .15s, color .15s; }
+.landing-button { display: inline-flex; flex-wrap: wrap; align-items: center; gap: .5rem; max-width: 100%; overflow-wrap: anywhere; padding: .875rem 1.25rem; border-radius: 6px; background: #ffffff; color: var(--ink); font-weight: 600; transition: background .15s, color .15s; }
 .landing-button i { color: var(--lagoon); }
 .landing-button small { font-weight: 400; color: var(--mist); }
 .landing-button:hover { background: var(--brand-lime); color: var(--ink); }
@@ -963,15 +969,28 @@ a.landing-contact-item:hover { border-color: var(--brand-lime); box-shadow: inse
     .home-grid { grid-template-columns: minmax(280px, 1fr) minmax(520px, 1.3fr); }
     .home-filters { position: absolute; inset: 0 auto 0 0; z-index: 10; width: 280px; box-shadow: 0 0 30px rgb(23 32 29 / .2); transform: translateX(-100%); transition: transform .2s; }
     .home-grid.filters-open .home-filters { transform: none; }
-    .home-filters-toggle { display: inline-flex; gap: 0.375rem; align-items: center; }
+    .home-filters-toggle { display: inline-flex; gap: 0.375rem; align-items: center; min-height: 2.75rem; }
+    .home-filters-close { display: inline-flex; }
+    .home-filters-backdrop { position: fixed; inset: 4.25rem 0 0; z-index: 9; display: block; background: rgb(23 32 29 / .35); }
 }
 @media (max-width: 1023.98px) {
     .home-grid { display: flex; flex-direction: column; overflow-y: auto; }
     .home-map { height: 45vh; flex-shrink: 0; }
     .home-list { overflow: visible; }
-    .home-filters { position: fixed; top: 4.25rem; }
-    .site-header { padding-inline: 1rem; }
-    .site-wordmark-place { display: none; }
+    .home-filters { position: fixed; top: 4.25rem; width: min(320px, 85vw); }
+    .site-header { position: relative; z-index: 20; padding-inline: 1rem; }
+    .site-burger { display: inline-flex; }
+    .site-header .site-nav {
+        position: absolute; inset: 100% 0 auto; display: none; flex-wrap: wrap; align-items: center; gap: 0 1.5rem;
+        max-height: calc(100dvh - 4.25rem); overflow-y: auto; padding: .5rem 1rem 1rem;
+        background: var(--ink); border-top: 1px solid #2a3330; box-shadow: 0 12px 24px rgb(0 0 0 / .3); font-size: 1rem;
+    }
+    .site-header.is-open .site-nav { display: flex; }
+    .site-header .site-nav-item { flex: 1 0 100%; gap: .75rem; min-height: 3rem; border-bottom: 1px solid #2a3330; }
+    .site-header .site-nav-item i { font-size: 1.25rem; }
+    .site-header .site-nav-sep { display: none; }
+    .site-header .site-nav a[lang], .site-header .site-nav-icon { align-items: center; min-height: 3rem; margin-top: .25rem; }
+    .site-header .site-nav-icon { margin-inline-start: auto; padding-inline: .5rem; }
 }
 @media (max-width: 1023.98px) {
     .landing-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -993,8 +1012,23 @@ a.landing-contact-item:hover { border-color: var(--brand-lime); box-shadow: inse
     .landing-contact-list, .site-footer-grid { grid-template-columns: minmax(0, 1fr); }
     .landing-hero { min-height: 26rem; }
     .landing-title { font-size: 2rem; }
-    .site-nav-item { font-size: 0; gap: 0; }
-    .site-nav-item i { font-size: 1.125rem; }
+    .landing-lead { font-size: 1rem; }
+    .landing-hero { padding-block: 3rem 2.5rem; }
+    .landing-actions .landing-button { flex: 1 1 100%; justify-content: center; }
+    .landing-section { padding-top: 2.5rem; }
+    .landing-h2 { font-size: 1.5rem; }
+    .landing-about-lead { font-size: 1.125rem; }
+    .landing-stats strong { font-size: 1.625rem; }
+    .site-footer { margin-top: 3rem; }
+    .site-footer-grid { gap: 2rem; padding-top: 2.5rem; }
+    .site-footer-bottom { flex-direction: column; gap: .5rem; }
+    .listing { padding-top: 1rem; }
+    .listing-head { flex-direction: column; gap: .5rem; }
+    .listing-box { padding: 1.25rem; }
+    .listing-price { font-size: 1.5rem; }
+    .home-list { padding: 1.25rem 1rem 2.5rem; }
+    .home-map { height: 40vh; height: 40dvh; }
+    .site-wordmark-name { font-size: 1.125rem; }
     .listing-gallery { grid-template-columns: 1fr 1fr; grid-template-rows: 14rem 7rem; }
     .listing-gallery img:first-child { grid-row: auto; grid-column: 1 / -1; }
     .listing-gallery img:nth-child(n+4) { display: none; }

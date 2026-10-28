@@ -31,7 +31,7 @@
   @livewireStyles
 </head>
 <body class="site antialiased flex h-full flex-col text-base">
-  <header class="site-header">
+  <header class="site-header" x-data="{ menuOpen: false }" :class="{ 'is-open': menuOpen }" @keydown.escape="menuOpen = false" @click.outside="menuOpen = false">
     <a href="{{ route('home') }}" class="site-wordmark">
       <img src="{{ asset('assets/img/logo-white.png') }}" alt="{{ config('app.name') }}" class="size-8 object-contain">
       <span class="flex flex-col gap-1">
@@ -40,7 +40,13 @@
       </span>
     </a>
 
-    <nav class="site-nav" aria-label="@lang('home.menu')">
+    <button type="button" class="site-burger" @click="menuOpen = !menuOpen" :aria-expanded="menuOpen.toString()" aria-expanded="false"
+      aria-controls="site-nav" aria-label="@lang('home.menu')">
+      <i class="ki-filled ki-burger-menu-2" x-show="!menuOpen"></i>
+      <i class="ki-filled ki-cross" x-show="menuOpen" x-cloak></i>
+    </button>
+
+    <nav class="site-nav" id="site-nav" aria-label="@lang('home.menu')" @click="menuOpen = false">
       @foreach ($menu as [$url, $icon, $label, $current])
         <a href="{{ $url }}" @class(['site-nav-item', 'is-current' => $current]) @if ($current) aria-current="page" @endif><i class="ki-filled {{ $icon }}"></i> @lang($label)</a>
       @endforeach

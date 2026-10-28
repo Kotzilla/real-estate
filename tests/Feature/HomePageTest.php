@@ -43,6 +43,12 @@ class HomePageTest extends TestCase
         $this->assertSame([], $current('/privacy'));
     }
 
+    public function test_the_header_menu_folds_behind_a_burger_on_small_screens(): void
+    {
+        $this->get('/')->assertOk()
+            ->assertSee(['class="site-burger"', 'aria-controls="site-nav"', 'id="site-nav"'], false);
+    }
+
     public function test_the_privacy_policy_is_in_both_languages(): void
     {
         $html = $this->get('/privacy')->assertOk()->assertSee(__('privacy.sections.0.0'))->assertSee(config('site.email'))->getContent();

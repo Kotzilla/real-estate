@@ -29,13 +29,14 @@
 
 @section('content')
   <div class="home-grid" x-data="propertyMap(@js($listings), @js($map), @js($labels))"
-    :class="{ 'filters-open': filtersOpen }">
+    :class="{ 'filters-open': filtersOpen }" @keydown.escape="filtersOpen = false">
 
     {{-- 1. Filters --}}
-    <aside class="home-filters kt-scrollable-y-auto" aria-label="@lang('home.filters')">
-      <div class="flex items-baseline justify-between">
+    <aside class="home-filters kt-scrollable-y-auto" id="home-filters" aria-label="@lang('home.filters')">
+      <div class="flex items-center justify-between gap-3">
         <h2 class="flex items-center gap-2 text-xl font-medium"><i class="ki-filled ki-filter text-[var(--lagoon)]"></i> @lang('home.filters')</h2>
-        <button type="button" class="link-quiet" @click="reset()" :disabled="!filtered">@lang('home.reset')</button>
+        <button type="button" class="link-quiet ms-auto" @click="reset()" :disabled="!filtered">@lang('home.reset')</button>
+        <button type="button" class="home-filters-close" @click="filtersOpen = false" aria-label="@lang('common.close')"><i class="ki-filled ki-cross"></i></button>
       </div>
 
       <div class="home-filter">
@@ -101,13 +102,15 @@
       </label>
     </aside>
 
+    <div class="home-filters-backdrop" x-show="filtersOpen" x-cloak @click="filtersOpen = false"></div>
+
     {{-- 2. The island --}}
     <section class="home-map" aria-label="@lang('home.map')">
       <div x-ref="map" class="size-full"></div>
       @unless ($map['token'])
         <div class="absolute inset-0 flex items-center justify-center text-sm text-[var(--mist)]">@lang('home.no_map')</div>
       @endunless
-      <button type="button" class="home-filters-toggle" @click="filtersOpen = !filtersOpen" :aria-expanded="filtersOpen.toString()">
+      <button type="button" class="home-filters-toggle" @click="filtersOpen = !filtersOpen" :aria-expanded="filtersOpen.toString()" aria-controls="home-filters">
         @lang('home.filters') <span x-show="filtered" x-text="'(' + filtered + ')'"></span>
       </button>
     </section>
