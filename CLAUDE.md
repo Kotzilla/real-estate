@@ -99,6 +99,14 @@ npm run dev / npm run build
 docker compose up -d  # app on :8082, MySQL on :3312
 ```
 
+## Servers
+
+One droplet, `ssh root@178.128.215.25` (Ubuntu, nginx, PHP 8.5-fpm, MySQL `real_estate` / `real_estate_dev`, deploy key for the repo). Deploy = `git pull` + `composer install` as root, then **artisan as the site's user** (`sudo -u www-data php artisan migrate --force && sudo -u www-data php artisan optimize`; `www-dev` on dev) — artisan run as root leaves root-owned cache/log files the site can't write.
+
+- **Production** `https://first-real-estate.com` — branch `main`, `/var/www/html`, runs as `www-data` (`APP_ENV=production`, no demo data), nginx `sites-enabled/digitalocean`.
+- **Dev** `dev.first-real-estate.com` — branch `develop`, `/var/www/dev`, own FPM pool as `www-dev` (`APP_ENV=staging`, dev deps installed so `DemoSeeder` runs), nginx `sites-enabled/dev`, basic auth `/etc/nginx/.htpasswd-dev`.
+- Code is root-owned and read-only to PHP; only `storage/` and `bootstrap/cache/` are writable; `.env` is 640. PHP-FPM disables `exec`, `shell_exec`, `proc_open`… (`/etc/php/8.5/fpm/conf.d/99-hardening.ini`; the CLI keeps them), so web code must never shell out.
+
 ## Project Structure
 
 Standard Laravel 12 layout. Pages: a thin controller per module (`PropertyController`, `PersonController`, `ContractController`, `DashboardController`) with a `FormRequest`; each list is a Livewire table (`app/Livewire/{Properties,People,Contracts}/Table.php`). Users, permissions and the activity log are Livewire pages copied from store.
