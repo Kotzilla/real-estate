@@ -42,7 +42,9 @@
 
     <button type="button" class="site-burger" @click="menuOpen = !menuOpen" :aria-expanded="menuOpen.toString()" aria-expanded="false"
       aria-controls="site-nav" aria-label="@lang('home.menu')">
-      <i class="ki-filled ki-burger-menu-2" x-show="!menuOpen"></i>
+      <svg x-show="!menuOpen" viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+        <path d="M4 7h16M4 12h16M4 17h16"/>
+      </svg>
       <i class="ki-filled ki-cross" x-show="menuOpen" x-cloak></i>
     </button>
 
