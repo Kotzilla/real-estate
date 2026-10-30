@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Enums\PropertyStatus;
 use App\Http\Requests\EnquiryRequest;
 use App\Models\Property;
+use App\Services\WhatsApp;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 
@@ -97,13 +98,15 @@ class ListingController extends Controller
      * Save a visitor's request to see a listing, for staff to call back (back office: Enquiries)
      *
      * @param  EnquiryRequest  $request
+     * @param  WhatsApp  $whatsApp
      * @param  string  $code
      * @return RedirectResponse
      */
-    public function enquire(EnquiryRequest $request, string $code): RedirectResponse
+    public function enquire(EnquiryRequest $request, WhatsApp $whatsApp, string $code): RedirectResponse
     {
         $property = Property::query()->listed()->where('code', $code)->firstOrFail();
-        $property->enquiries()->create($request->safe()->only(['name', 'phone', 'message']));
+        $enquiry = $property->enquiries()->create($request->safe()->only(['name', 'phone', 'message']));
+        defer(fn () => $whatsApp->enquiry($enquiry)); // after the response: the visitor never waits on Meta
 
         return redirect($property->publicUrl().'#enquiry')->with('enquiry_sent', true);
     }

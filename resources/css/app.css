@@ -756,6 +756,27 @@ html[lang="th"] body.site { --display: 'Noto Serif Thai', 'playfair-display', se
 .site-flag { width: 1rem; height: 1rem; border-radius: 9999px; object-fit: cover; opacity: .6; transition: opacity .15s; }
 .site-nav a[lang]:hover .site-flag, .site-nav .is-current .site-flag { opacity: 1; }
 .site-nav-sep { width: 1px; height: 1rem; background: #3a4541; }
+/* Signed-in staff: avatar + dropdown (Alpine `open` in layouts/site); laid out flat in the burger panel below 1024px */
+.site-user { position: relative; display: flex; }
+.site-avatar {
+    display: inline-flex; align-items: center; justify-content: center; width: 2.25rem; height: 2.25rem; flex-shrink: 0;
+    border-radius: 9999px; background: var(--brand-lime); color: #12171f; font-size: .875rem; font-weight: 600;
+}
+.site-nav .site-user-toggle { border-radius: 9999px; transition: box-shadow .15s; }
+.site-nav .site-user-toggle:hover, .site-nav .site-user-toggle[aria-expanded="true"] { box-shadow: 0 0 0 3px rgb(193 223 15 / .35); }
+.site-user-menu {
+    position: absolute; top: calc(100% + .75rem); right: 0; z-index: 30; display: none; width: 260px; padding: .375rem;
+    border-radius: .5rem; background: #ffffff; color: #12171f; box-shadow: 0 12px 32px rgb(0 0 0 / .25);
+}
+.site-user-menu.is-open { display: block; }
+.site-user-head { display: flex; align-items: center; gap: .625rem; padding: .5rem .5rem .75rem; margin-bottom: .25rem; border-bottom: 1px solid #e8ebf1; }
+.site-nav .site-user-menu a, .site-nav .site-user-menu button {
+    display: flex; align-items: center; gap: .625rem; width: 100%; padding: .5rem; border-radius: .375rem; color: #3f4254; font-weight: 500;
+}
+.site-nav .site-user-menu a:hover, .site-nav .site-user-menu button:hover { background: #f1f3f8; color: var(--primary); }
+.site-user-menu i { font-size: 1.125rem; }
+.site-user-menu form { margin-top: .25rem; padding-top: .25rem; border-top: 1px solid #e8ebf1; }
+.site-nav .site-user-menu form button:hover { color: #d9214e; }
 /* Below 1024px the menu folds behind a burger and drops down under the header (Alpine `menuOpen` in layouts/site) */
 .site-burger { display: none; align-items: center; justify-content: center; width: 2.75rem; height: 2.75rem; margin-inline-end: -.5rem; border-radius: 6px; color: #e9ece7; font-size: 1.5rem; }
 .site-burger:hover { color: var(--brand-lime); }
@@ -998,6 +1019,14 @@ a.landing-contact-item:hover { border-color: var(--brand-lime); box-shadow: inse
     .site-header .site-nav-sep { display: none; }
     .site-header .site-nav a[lang], .site-header .site-nav-icon { align-items: center; min-height: 3rem; margin-top: .25rem; }
     .site-header .site-nav-icon { margin-inline-start: auto; padding-inline: .5rem; }
+    .site-header .site-user { flex: 1 0 100%; margin-top: .75rem; border-top: 1px solid #2a3330; padding-top: .5rem; }
+    .site-header .site-user-toggle { display: none; }
+    .site-header .site-user-menu { position: static; display: block; width: 100%; padding: 0; background: none; color: #e9ece7; box-shadow: none; }
+    .site-header .site-user-head { border-color: #2a3330; }
+    .site-header .site-user-head .text-muted-foreground { color: #8a938f; }
+    .site-header .site-nav .site-user-menu a, .site-header .site-nav .site-user-menu button { min-height: 3rem; color: #c9cfcb; font-weight: 400; }
+    .site-header .site-nav .site-user-menu a:hover, .site-header .site-nav .site-user-menu button:hover { background: none; color: var(--brand-lime); }
+    .site-header .site-user-menu form { border-color: #2a3330; }
 }
 @media (max-width: 1023.98px) {
     .landing-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }

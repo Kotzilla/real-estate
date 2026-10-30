@@ -3,9 +3,12 @@
 namespace Tests\Feature;
 
 use App\Enums\PropertyStatus;
+use App\Enums\UserRole;
 use App\Models\District;
 use App\Models\Property;
+use App\Models\User;
 use Database\Seeders\LocationSeeder;
+use Database\Seeders\PermissionSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -47,6 +50,21 @@ class HomePageTest extends TestCase
     {
         $this->get('/')->assertOk()
             ->assertSee(['class="site-burger"', 'aria-controls="site-nav"', 'id="site-nav"'], false);
+    }
+
+    public function test_signed_in_staff_get_their_menu_in_the_header(): void
+    {
+        $this->get('/')->assertSee(route('login'), false)->assertDontSee('class="site-user"', false);
+
+        $this->seed(PermissionSeeder::class);
+        $user = User::factory()->create(['name' => 'Napat']);
+        $user->assignRole(UserRole::Agent->value);
+
+        $html = $this->actingAs($user)->get('/')->assertOk()
+            ->assertSee(['class="site-user"', 'Napat', $user->email, route('backend.dashboard'), route('backend.enquiries.index'), route('backend.logout')], false)
+            ->assertDontSee('title="'.__('home.staff').'"', false)
+            ->getContent();
+        $this->assertSame(substr_count($html, '<div'), substr_count($html, '</div>'));
     }
 
     public function test_the_privacy_policy_is_in_both_languages(): void

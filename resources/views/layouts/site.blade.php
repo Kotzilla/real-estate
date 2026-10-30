@@ -9,6 +9,8 @@
       [route('listings', ['offer' => 'rent']), 'ki-key', 'home.rent', $offer === 'rent'],
       [route('home').'#contact', 'ki-messages', 'site.contact', false],
   ];
+  $user = auth()->user();
+  $role = $user ? \App\Enums\UserRole::tryFrom((string) $user->getRoleNames()->first()) : null;
 @endphp
 <!DOCTYPE html>
 <html class="h-full" data-kt-theme="true" data-kt-theme-mode="light" lang="{{ str_replace('_', '-', app()->getLocale()) }}">
@@ -81,7 +83,39 @@
       @foreach ($locales as $code => [$label, $flag])
         <a href="{{ route('lang.switch', $code) }}" class="{{ app()->getLocale() === $code ? 'is-current' : '' }}" lang="{{ $code }}"><img alt="" class="site-flag" src="{{ asset('assets/media/flags/'.$flag) }}">{{ $label }}</a>
       @endforeach
-      <a href="{{ route('login') }}" class="site-nav-icon" title="@lang('home.staff')" aria-label="@lang('home.staff')"><i class="ki-filled ki-entrance-left text-lg"></i></a>
+      @if ($user)
+        {{-- Signed-in staff: an avatar with their menu (a dropdown on desktop, laid out in the burger panel below 1024px) --}}
+        <div class="site-user" x-data="{ open: false }" @click.outside="open = false" @keydown.escape.stop="open = false" @click.stop>
+          <button type="button" class="site-user-toggle" @click="open = !open" :aria-expanded="open.toString()" aria-expanded="false" aria-label="{{ $user->name }}">
+            <span class="site-avatar">{{ mb_strtoupper(mb_substr($user->name, 0, 1)) }}</span>
+          </button>
+          <div class="site-user-menu" :class="{ 'is-open': open }">
+            <div class="site-user-head">
+              <span class="site-avatar">{{ mb_strtoupper(mb_substr($user->name, 0, 1)) }}</span>
+              <span class="flex min-w-0 grow flex-col gap-1">
+                <span class="truncate text-sm font-semibold leading-none">{{ $user->name }}</span>
+                <span class="truncate text-xs leading-none text-muted-foreground">{{ $user->email }}</span>
+              </span>
+              @if ($role)
+                <span class="kt-badge kt-badge-sm {{ $role->badgeClass() }}">{{ $role->label() }}</span>
+              @endif
+            </div>
+            <a href="{{ route('backend.dashboard') }}"><i class="ki-filled ki-element-11"></i> @lang('Dashboard')</a>
+            @can('viewAny', \App\Models\Property::class)
+              <a href="{{ route('backend.properties.index') }}"><i class="ki-filled ki-home-2"></i> @lang('Properties')</a>
+            @endcan
+            @can('viewAny', \App\Models\Enquiry::class)
+              <a href="{{ route('backend.enquiries.index') }}"><i class="ki-filled ki-calendar-tick"></i> @lang('Enquiries')</a>
+            @endcan
+            <form method="POST" action="{{ route('backend.logout') }}">
+              @csrf
+              <button type="submit"><i class="ki-filled ki-exit-right"></i> @lang('Log out')</button>
+            </form>
+          </div>
+        </div>
+      @else
+        <a href="{{ route('login') }}" class="site-nav-icon" title="@lang('home.staff')" aria-label="@lang('home.staff')"><i class="ki-filled ki-entrance-left text-lg"></i></a>
+      @endif
     </nav>
   </header>
 

@@ -38,6 +38,18 @@ return [
         'maps_key' => env('GOOGLE_MAP_API'),
     ],
 
+    // New enquiries go on WhatsApp to the users who handle them (App\Services\WhatsApp). The token is a system user's
+    // permanent token from Meta Business Settings; the phone id is the sender number's id (not the number); "to" is a
+    // comma list of extra numbers (the office line), 0812345678 or 66812345678.
+    'whatsapp' => [
+        'token' => env('WHATSAPP_TOKEN'),
+        'phone_id' => env('WHATSAPP_PHONE_ID'),
+        'to' => env('WHATSAPP_TO'),
+        'template' => env('WHATSAPP_TEMPLATE'),
+        'language' => env('WHATSAPP_LANGUAGE', 'en'),
+        'version' => env('WHATSAPP_API_VERSION', 'v23.0'),
+    ],
+
     'slack' => [
         'notifications' => [
             'bot_user_oauth_token' => env('SLACK_BOT_USER_OAUTH_TOKEN'),

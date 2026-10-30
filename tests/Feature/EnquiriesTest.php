@@ -9,9 +9,11 @@ use App\Models\District;
 use App\Models\Enquiry;
 use App\Models\Property;
 use App\Models\User;
+use App\Services\WhatsApp;
 use Database\Seeders\LocationSeeder;
 use Database\Seeders\PermissionSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Http;
 use Livewire\Livewire;
 use Tests\TestCase;
 
@@ -37,6 +39,28 @@ class EnquiriesTest extends TestCase
             'enquirable_type' => 'property', 'enquirable_id' => $property->id, 'name' => 'Anna', 'phone' => '0812345678', 'status' => 'open',
         ]);
         $this->followingRedirects()->get($property->publicUrl())->assertOk();
+    }
+
+    public function test_a_new_enquiry_is_sent_to_the_office_on_whatsapp(): void
+    {
+        config(['services.whatsapp' => [
+            'token' => 'secret', 'phone_id' => '123', 'to' => '66811111111, 081-111 1111',
+            'template' => null, 'language' => 'en', 'version' => 'v23.0',
+        ]]);
+        Http::fake(['graph.facebook.com/*' => Http::response(['messages' => [['id' => 'wamid.1']]])]);
+        User::factory()->create(['phone' => '082-222 2222'])->assignRole(UserRole::Agent->value);
+        User::factory()->create(['phone' => null])->assignRole(UserRole::Agent->value);
+        User::factory()->create(['phone' => '0833333333']); // may not handle enquiries
+        $property = $this->listing();
+
+        $this->withoutDefer()->post(route('listing.enquire', $property->code), ['name' => 'Anna', 'phone' => '0812345678'])->assertRedirect();
+
+        $this->assertSame(['66822222222', '66811111111'], app(WhatsApp::class)->recipients());
+        Http::assertSentCount(2);
+        Http::assertSent(fn ($request) => $request->url() === 'https://graph.facebook.com/v23.0/123/messages'
+            && $request->hasHeader('Authorization', 'Bearer secret')
+            && $request['to'] === '66822222222'
+            && str_contains($request['text']['body'], "{$property->code}\nAnna 0812345678"));
     }
 
     public function test_name_and_phone_are_required_and_bots_are_turned_away(): void
