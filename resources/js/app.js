@@ -48,6 +48,26 @@ window.confirmSubmit = function (event, { title, text, confirm, cancel }) {
   return false;
 };
 
+// Focus the search box when the search modal is opened (KTUI animates the modal in, hence the delay).
+document.addEventListener('click', (event) => {
+  if (event.target.closest('[data-kt-modal-toggle="#search_modal"]')) {
+    setTimeout(() => document.getElementById('search_keyword')?.focus(), 150);
+  }
+});
+
+// Shortcut: Cmd+K or Ctrl+K opens the global search modal
+document.addEventListener('keydown', (event) => {
+  if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
+    const searchModal = document.getElementById('search_modal');
+    if (searchModal && window.KTModal) {
+      event.preventDefault();
+      const modal = window.KTModal.getInstance(searchModal) || new window.KTModal(searchModal);
+      modal.toggle();
+      setTimeout(() => document.getElementById('search_keyword')?.focus(), 150);
+    }
+  }
+});
+
 
 const handleToast = (event) => {
   const detail = Array.isArray(event.detail) ? event.detail[0] : event.detail;

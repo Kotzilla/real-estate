@@ -55,6 +55,8 @@
       </div>
     </div>
 
+    @livewire('layout.search')
+    @livewire('layout.notification-drawer')
     @include('layouts.partials.lightbox')
 
     <script src="{{ asset('assets/js/core.bundle.js') }}"></script>

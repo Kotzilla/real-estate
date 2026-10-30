@@ -34,6 +34,13 @@
     </nav>
 
     <div class="flex items-center gap-2.5">
+      <button type="button" aria-label="@lang('search.title')" data-kt-modal-toggle="#search_modal"
+        class="kt-btn kt-btn-ghost kt-btn-icon hover:bg-primary/10 hover:[&_i]:text-primary group size-9 rounded-full">
+        <i class="ki-filled ki-magnifier group-hover:text-primary text-lg"></i>
+      </button>
+
+      @livewire('layout.notification-bell')
+
       <div class="shrink-0" data-kt-dropdown="true" data-kt-dropdown-offset="10px, 10px"
         data-kt-dropdown-placement="bottom-end" data-kt-dropdown-trigger="click">
         <button type="button" class="shrink-0 cursor-pointer rounded-full"

@@ -1,6 +1,6 @@
 {
   "resources/css/app.css": {
-    "file": "assets/app-DZJ3UW4W.css",
+    "file": "assets/app-C-dAaZ01.css",
     "src": "resources/css/app.css",
     "isEntry": true,
     "name": "app",
@@ -29,7 +29,7 @@
     "src": "resources/fonts/Sarabun-SemiBold.woff2"
   },
   "resources/js/app.js": {
-    "file": "assets/app-BTf5Hnin.js",
+    "file": "assets/app-DiXjMTVF.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true,
