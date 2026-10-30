@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Enums\PropertyStatus;
+use App\Http\Requests\EnquiryRequest;
 use App\Models\Property;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
@@ -12,7 +13,7 @@ use Illuminate\View\View;
  *
  * The public listings: the map search at /properties (filters | Mapbox map | listings) and a listing's own page,
  * /property/{code}/{slug}. The code finds it; the slug is only for people and search engines, so a missing or old one
- * (the name changed) is sent on to the current URL with a 301.
+ * (the name changed) is sent on to the current URL with a 301. Its "arrange a viewing" form posts to enquire().
  *
  * @SuppressWarnings(PHPMD.StaticAccess)
  * @package App\Controllers
@@ -90,5 +91,20 @@ class ListingController extends Controller
             'facilities' => $property->tagsWithType(Property::FACILITY)->pluck('name'),
             'mapToken' => config('services.mapbox.token'),
         ]);
+    }
+
+    /**
+     * Save a visitor's request to see a listing, for staff to call back (back office: Enquiries)
+     *
+     * @param  EnquiryRequest  $request
+     * @param  string  $code
+     * @return RedirectResponse
+     */
+    public function enquire(EnquiryRequest $request, string $code): RedirectResponse
+    {
+        $property = Property::query()->listed()->where('code', $code)->firstOrFail();
+        $property->enquiries()->create($request->safe()->only(['name', 'phone', 'message']));
+
+        return redirect($property->publicUrl().'#enquiry')->with('enquiry_sent', true);
     }
 }

@@ -4,6 +4,7 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\SetPasswordController;
 use App\Http\Controllers\ContractController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\EnquiryController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ListingController;
 use App\Http\Controllers\LocaleController;
@@ -11,6 +12,7 @@ use App\Http\Controllers\PersonController;
 use App\Http\Controllers\PropertyController;
 use App\Http\Middleware\ComingSoon;
 use App\Models\Contract;
+use App\Models\Enquiry;
 use App\Models\Person;
 use App\Models\Property;
 use App\Models\User;
@@ -22,6 +24,8 @@ Route::middleware(ComingSoon::class)->group(function () {
     Route::get('/', HomeController::class)->name('home');
     Route::get('/properties', [ListingController::class, 'index'])->name('listings');
     Route::get('/property/{code}/{slug?}', [ListingController::class, 'show'])->where('code', '[A-Z]{3}-[0-9]+')->name('listing');
+    Route::post('/property/{code}/enquiry', [ListingController::class, 'enquire'])->where('code', '[A-Z]{3}-[0-9]+')
+        ->middleware('throttle:5,10')->name('listing.enquire');
     Route::view('/privacy', 'privacy')->name('privacy');
 });
 Route::redirect('/login', '/backend/login');
@@ -71,6 +75,11 @@ Route::prefix('backend')->group(function () {
         Route::put('/contracts/{contract}', [ContractController::class, 'update'])->can('update', 'contract')->name('contracts.update');
         Route::get('/contracts/{contract}/print/{lang}', [ContractController::class, 'print'])->can('view', 'contract')
             ->whereIn('lang', ['en', 'th'])->name('contracts.print');
+
+        // Viewing requests from the public listing pages (App\Policies\EnquiryPolicy)
+        Route::view('/enquiries', 'enquiries.index')->can('viewAny', Enquiry::class)->name('enquiries.index');
+        Route::get('/enquiries/{enquiry}', [EnquiryController::class, 'show'])->can('view', 'enquiry')->name('enquiries.show');
+        Route::put('/enquiries/{enquiry}', [EnquiryController::class, 'update'])->can('update', 'enquiry')->name('enquiries.update');
 
         // Staff accounts: App\Policies\UserPolicy (settings.manage), checked again in the component
         Route::view('/users', 'users.index')->can('viewAny', User::class)->name('users.index');

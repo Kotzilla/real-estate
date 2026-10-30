@@ -33,6 +33,7 @@ class ListingPageTest extends TestCase
         $html = $this->get($url)->assertOk()
             ->assertSee('<link rel="canonical" href="'.$url.'">', false)
             ->assertSee('Pool &amp; garden', false)
+            ->assertSee('limitedTextarea(1000)', false)->assertSee('limited-textarea', false) // the viewing form's message box
             ->getContent();
         $this->assertSame(substr_count($html, '<div'), substr_count($html, '</div>'));
 

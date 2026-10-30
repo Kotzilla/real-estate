@@ -23,4 +23,16 @@ return [
     'reserved' => 'Reserved',
     'map' => 'Map of where :title is',
     'photo' => 'Photo :n of :title',
+
+    // the "arrange a viewing" form (App\Http\Requests\EnquiryRequest)
+    'enquiry' => [
+        'title' => 'Arrange a viewing',
+        'hint' => 'Leave your name and number and we will call you back to set a time.',
+        'name' => 'Your name',
+        'phone' => 'Phone number',
+        'message' => 'Message',
+        'placeholder' => 'When would suit you to visit?',
+        'send' => 'Request a viewing',
+        'sent' => 'Thank you! We have your request and will call you back soon.',
+    ],
 ];

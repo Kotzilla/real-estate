@@ -2,7 +2,9 @@
 
 namespace App\Providers;
 
+use App\Models\Comment;
 use App\Models\Contract;
+use App\Models\Enquiry;
 use App\Models\Person;
 use App\Models\Property;
 use App\Models\User;
@@ -46,6 +48,8 @@ class AppServiceProvider extends ServiceProvider
             'property' => Property::class,
             'person' => Person::class,
             'contract' => Contract::class,
+            'enquiry' => Enquiry::class,
+            'comment' => Comment::class,
             'user' => User::class,
             'role' => \Spatie\Permission\Models\Role::class,
         ]);

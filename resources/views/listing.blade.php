@@ -24,15 +24,15 @@
 @section('title', __('listing.title', ['title' => $title, 'type' => $property->type->label(), 'offer' => __('listing.'.$offer), 'area' => $area]))
 @section('description', \Illuminate\Support\Str::limit($description ?: __('home.meta'), 155))
 
-@push('head')
-  <link rel="canonical" href="{{ $property->publicUrl() }}">
-  <meta property="og:type" content="website">
-  <meta property="og:title" content="{{ $title }}">
-  <meta property="og:description" content="{{ \Illuminate\Support\Str::limit($description ?: __('home.meta'), 155) }}">
-  <meta property="og:url" content="{{ $property->publicUrl() }}">
-  @if ($photos->isNotEmpty())
-    <meta property="og:image" content="{{ $photos->first()->src('lg') }}">
-  @endif
+@section('canonical', $property->publicUrl())
+@section('og_title', $title)
+@section('og_description', \Illuminate\Support\Str::limit($description ?: __('home.meta'), 155))
+@if ($photos->isNotEmpty())
+  @section('og_image', $photos->first()->src('lg'))
+@endif
+
+@push('scripts')
+  @vite('resources/js/limited-textarea.js')
 @endpush
 
 @section('content')
@@ -132,6 +132,36 @@
               </div>
             </div>
           @endif
+
+          <div class="listing-box" id="enquiry">
+            <h2 class="listing-h2"><i class="ki-filled ki-calendar"></i> @lang('listing.enquiry.title')</h2>
+            @if (session('enquiry_sent'))
+              <p class="listing-sent"><i class="ki-filled ki-check-circle"></i> @lang('listing.enquiry.sent')</p>
+            @else
+              <p class="listing-hint">@lang('listing.enquiry.hint')</p>
+              <form method="POST" action="{{ route('listing.enquire', $property->code) }}" class="listing-form">
+                @csrf
+                {{-- honeypot: hidden from people, so only bots fill it (EnquiryRequest) --}}
+                <input type="text" name="website" class="hidden" tabindex="-1" autocomplete="off" aria-hidden="true">
+                <label>
+                  <span class="required">@lang('listing.enquiry.name')</span>
+                  <input type="text" name="name" value="{{ old('name') }}" maxlength="100" autocomplete="name" class="kt-input" @error('name') aria-invalid="true" @enderror>
+                  @error('name')<small class="listing-error">{{ $message }}</small>@enderror
+                </label>
+                <label>
+                  <span class="required">@lang('listing.enquiry.phone')</span>
+                  <input type="tel" name="phone" value="{{ old('phone') }}" maxlength="20" autocomplete="tel" class="kt-input" @error('phone') aria-invalid="true" @enderror>
+                  @error('phone')<small class="listing-error">{{ $message }}</small>@enderror
+                </label>
+                <label>
+                  <span>@lang('listing.enquiry.message')</span>
+                  <x-textarea name="message" maxlength="1000" :placeholder="__('listing.enquiry.placeholder')" :aria-invalid="$errors->has('message') ? 'true' : null">{{ old('message') }}</x-textarea>
+                  @error('message')<small class="listing-error">{{ $message }}</small>@enderror
+                </label>
+                <button type="submit" class="listing-button"><i class="ki-filled ki-calendar-tick"></i> @lang('listing.enquiry.send')</button>
+              </form>
+            @endif
+          </div>
         </aside>
       </div>
     </article>

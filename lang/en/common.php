@@ -28,5 +28,6 @@ return [
     'back' => 'Back',
     'save' => 'Save',
     'edit' => 'Edit',
+    'chars_left' => 'Characters left',
     'has_errors' => 'Some fields need fixing. Check the ones marked in red.',
 ];

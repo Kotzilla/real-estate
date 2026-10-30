@@ -13,6 +13,7 @@ return [
         'properties' => ['label' => 'Properties', 'icon' => 'home-3'],
         'people' => ['label' => 'Contacts', 'icon' => 'people'],
         'contracts' => ['label' => 'Contracts', 'icon' => 'document'],
+        'enquiries' => ['label' => 'Enquiries', 'icon' => 'calendar-tick'],
         'activity' => ['label' => 'Activity log', 'icon' => 'time'],
     ],
 
@@ -31,6 +32,10 @@ return [
         'contracts' => [
             'view' => ['label' => 'View contracts', 'hint' => 'Leases and sales, their commission, and printing them.'],
             'manage' => ['label' => 'Add and edit contracts', 'hint' => 'Prepare, sign off, complete or cancel leases and sales.'],
+        ],
+        'enquiries' => [
+            'view' => ['label' => 'View enquiries', 'hint' => 'Viewing requests left on the public listing pages, with name and phone.'],
+            'manage' => ['label' => 'Follow up enquiries', 'hint' => 'Change an enquiry\'s status and add follow-up notes.'],
         ],
         'activity' => [
             'view' => ['label' => 'View the activity log', 'hint' => 'Who signed in and what each user changed, with old and new values and IP.'],

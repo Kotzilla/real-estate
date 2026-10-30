@@ -35,6 +35,9 @@ class PermissionSeeder extends Seeder
         // App\Policies\ContractPolicy: leases and sales, and printing them
         'contracts.view' => ['manager', 'agent'],
         'contracts.manage' => ['manager', 'agent'],
+        // App\Policies\EnquiryPolicy: viewing requests from the public site, and marking them handled
+        'enquiries.view' => ['manager', 'agent'],
+        'enquiries.manage' => ['manager', 'agent'],
         // App\Policies\ActivityPolicy: who did what in the back office (sign-ins and changes, with IP and old values)
         'activity.view' => [],
     ];

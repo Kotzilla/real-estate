@@ -1,7 +1,7 @@
 {{--
   A form field: label (with the red asterisk when required), the control, an optional hint and the field's error.
-  type: text / tel / email / number (an input), date (flatpickr via datePicker, value Y-m-d), textarea (auto-size, give
-  it a maxlength matching the request's max:). Pass a slot instead for a select or anything else — the slot is then the
+  type: text / tel / email / number (an input), date (flatpickr via datePicker, value Y-m-d), textarea (<x-textarea>:
+  grows with its text, a ring fills up to its maxlength — give it one matching the request's max:). Pass a slot instead for a select or anything else — the slot is then the
   control, and it sets its own aria-invalid.
   <x-field name="name" :label="__('properties.form.name')" :value="$property->name" required />
 --}}
@@ -15,7 +15,7 @@
   @if (! $slot->isEmpty())
     {{ $slot }}
   @elseif ($type === 'textarea')
-    <textarea id="{{ $id }}" name="{{ $name }}" {{ $attributes->merge(['rows' => 3])->class('kt-textarea auto-size w-full') }} @error($name) aria-invalid="true" @enderror>{{ $current }}</textarea>
+    <x-textarea id="{{ $id }}" name="{{ $name }}" :attributes="$attributes" :aria-invalid="$errors->has($name) ? 'true' : null">{{ $current }}</x-textarea>
   @elseif ($type === 'date')
     <div x-data="datePicker">
       <input x-ref="input" type="text" id="{{ $id }}" name="{{ $name }}" value="{{ $current }}" {{ $attributes->class('kt-input w-full') }} @error($name) aria-invalid="true" @enderror>

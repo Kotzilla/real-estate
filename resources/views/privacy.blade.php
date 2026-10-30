@@ -8,10 +8,7 @@
 
 @section('title', __('privacy.title').' — '.$name)
 @section('description', __('privacy.meta', ['name' => $name]))
-
-@push('head')
-  <link rel="canonical" href="{{ route('privacy') }}">
-@endpush
+@section('canonical', route('privacy'))
 
 @section('content')
   <div class="kt-scrollable-y-auto grow">

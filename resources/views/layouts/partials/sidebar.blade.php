@@ -5,6 +5,7 @@
   $canViewProperties = (bool) $user?->can('viewAny', \App\Models\Property::class);
   $canViewPeople = (bool) $user?->can('viewAny', \App\Models\Person::class);
   $canViewContracts = (bool) $user?->can('viewAny', \App\Models\Contract::class);
+  $canViewEnquiries = (bool) $user?->can('viewAny', \App\Models\Enquiry::class);
   $canViewActivity = (bool) $user?->can('viewAny', \Spatie\Activitylog\Models\Activity::class);
 
   $isArchivedUsers = request()->routeIs('backend.users.archived') || request('status') === 'archived';
@@ -25,6 +26,12 @@
 
   if ($canViewContracts) {
     $mainItems[] = [__('Contracts'), 'document', route('backend.contracts.index'), request()->routeIs('backend.contracts.*'), null];
+  }
+
+  if ($canViewEnquiries) {
+    // the open ones (nobody has picked them up yet), so staff see new requests from any page
+    $newEnquiries = \App\Models\Enquiry::query()->where('status', \App\Enums\EnquiryStatus::Open->value)->count();
+    $mainItems[] = [__('Enquiries').($newEnquiries ? " ($newEnquiries)" : ''), 'calendar-tick', route('backend.enquiries.index'), request()->routeIs('backend.enquiries.*'), null];
   }
 
   if ($canViewPeople) {

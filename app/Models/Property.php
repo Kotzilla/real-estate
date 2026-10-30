@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
 use Spatie\Tags\HasTags;
@@ -149,6 +150,16 @@ class Property extends Model
     public function contracts(): HasMany
     {
         return $this->hasMany(Contract::class)->latest('signed_on')->latest('id');
+    }
+
+    /**
+     * Visitors' requests to see it, from its public page
+     *
+     * @return MorphMany<Enquiry, $this>
+     */
+    public function enquiries(): MorphMany
+    {
+        return $this->morphMany(Enquiry::class, 'enquirable');
     }
 
     /**

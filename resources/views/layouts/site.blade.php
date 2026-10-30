@@ -16,8 +16,33 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="csrf-token" content="{{ csrf_token() }}">
-  <title>@yield('title', config('app.name'))</title>
-  <meta name="description" content="@yield('description', __('home.meta'))">
+  @php
+    // Search engines and social cards: a page may override any of these with @section('og_title', ...).
+    // Section content is stored escaped by Blade, so decode it and let {{ }} escape it once in the attribute.
+    $meta = fn (string $section, string $default) => trim(html_entity_decode(strip_tags($__env->yieldContent($section, $default)), ENT_QUOTES)) ?: $default;
+    $metaTitle = $meta('title', config('app.name'));
+    $metaDescription = $meta('description', __('home.meta'));
+    $metaCanonical = $meta('canonical', url()->current());
+    $ogTitle = $meta('og_title', $metaTitle);
+    $ogDescription = $meta('og_description', $metaDescription);
+    $ogImage = $meta('og_image', asset('assets/img/web-share.jpg'));
+  @endphp
+  <title>{{ $metaTitle }}</title>
+  <meta name="description" content="{{ $metaDescription }}">
+  <link rel="canonical" href="{{ $metaCanonical }}">
+  <meta property="og:type" content="{{ $meta('og_type', 'website') }}">
+  <meta property="og:site_name" content="{{ config('app.name') }}">
+  <meta property="og:locale" content="{{ app()->getLocale() === 'th' ? 'th_TH' : 'en_US' }}">
+  <meta property="og:locale:alternate" content="{{ app()->getLocale() === 'th' ? 'en_US' : 'th_TH' }}">
+  <meta property="og:title" content="{{ $ogTitle }}">
+  <meta property="og:description" content="{{ $ogDescription }}">
+  <meta property="og:url" content="{{ $meta('og_url', $metaCanonical) }}">
+  <meta property="og:image" content="{{ $ogImage }}">
+  <meta property="og:image:alt" content="{{ $ogTitle }}">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="{{ $ogTitle }}">
+  <meta name="twitter:description" content="{{ $ogDescription }}">
+  <meta name="twitter:image" content="{{ $ogImage }}">
   <link rel="icon" type="image/png" href="{{ asset('favicon.png') }}">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -33,7 +58,7 @@
 <body class="site antialiased flex h-full flex-col text-base">
   <header class="site-header" x-data="{ menuOpen: false }" :class="{ 'is-open': menuOpen }" @keydown.escape="menuOpen = false" @click.outside="menuOpen = false">
     <a href="{{ route('home') }}" class="site-wordmark">
-      <img src="{{ asset('assets/img/logo-white.png') }}" alt="{{ config('app.name') }}" class="size-8 object-contain">
+      <img src="{{ asset('assets/img/logo.png') }}" alt="{{ config('app.name') }}" class="size-8 object-contain">
       <span class="flex flex-col gap-1">
         <span class="site-wordmark-name">{{ config('app.name') }}</span>
         <span class="site-wordmark-place">@lang('home.island')</span>

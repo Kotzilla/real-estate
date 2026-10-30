@@ -25,6 +25,8 @@ return [
         'contract-create' => 'เพิ่มสัญญา',
         'contract-update' => 'แก้ไขสัญญา',
         'contract-print' => 'พิมพ์สัญญา',
+        'enquiry-update' => 'เปลี่ยนสถานะคำขอนัดหมาย',
+        'comment-create' => 'เพิ่มบันทึก',
         'user-invite' => 'เชิญผู้ใช้',
         'user-update' => 'แก้ไขผู้ใช้',
         'user-archive' => 'เก็บผู้ใช้เข้าคลัง',

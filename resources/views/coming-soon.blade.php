@@ -11,6 +11,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{{ config('app.name') }} · @lang('site.soon_title')</title>
   <meta name="description" content="@lang('home.meta')">
+  {{-- Social cards while the site is behind the coming-soon page (the site layout holds them once it is live) --}}
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="{{ config('app.name') }}">
+  <meta property="og:locale" content="{{ app()->getLocale() === 'th' ? 'th_TH' : 'en_US' }}">
+  <meta property="og:title" content="{{ config('app.name') }} · @lang('site.soon_title')">
+  <meta property="og:description" content="@lang('home.meta')">
+  <meta property="og:url" content="{{ url('/') }}">
+  <meta property="og:image" content="{{ asset('assets/img/web-share.jpg') }}">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="{{ config('app.name') }} · @lang('site.soon_title')">
+  <meta name="twitter:description" content="@lang('home.meta')">
+  <meta name="twitter:image" content="{{ asset('assets/img/web-share.jpg') }}">
+  <link rel="canonical" href="{{ url('/') }}">
   <link rel="icon" type="image/png" href="{{ asset('favicon.png') }}">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

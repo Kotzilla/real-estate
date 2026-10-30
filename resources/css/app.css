@@ -881,6 +881,13 @@ html[lang="th"] body.site { --display: 'Noto Serif Thai', 'playfair-display', se
 .listing-button:hover { background: var(--brand-lime); color: var(--ink); }
 .listing-button.is-quiet { background: #ffffff; color: var(--ink); border: 1px solid var(--hairline); }
 .listing-button.is-quiet:hover { border-color: var(--brand-lime); background: var(--brand-lime); }
+.listing-hint { margin-bottom: 1rem; font-size: 0.875rem; color: var(--mist); }
+.listing-form { display: flex; flex-direction: column; gap: .875rem; }
+.listing-form label { display: flex; flex-direction: column; gap: .375rem; font-size: 0.875rem; font-weight: 500; }
+.listing-form .listing-button { border: 0; cursor: pointer; }
+.listing-error { font-weight: 400; color: var(--destructive); }
+.listing-sent { display: flex; align-items: flex-start; gap: .5rem; line-height: 1.6; }
+.listing-sent i { margin-top: .25rem; color: var(--lagoon); }
 
 /* Landing page (home.blade.php): a full-width beach hero, the newest listings three across, area tiles */
 .landing-hero { position: relative; display: flex; align-items: flex-end; min-height: 32rem; padding: 4rem 1.75rem; overflow: hidden; background: var(--ink); color: #ffffff; }

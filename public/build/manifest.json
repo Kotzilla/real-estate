@@ -1,6 +1,6 @@
 {
   "resources/css/app.css": {
-    "file": "assets/app-B70g7xUL.css",
+    "file": "assets/app-C78gvo4m.css",
     "src": "resources/css/app.css",
     "isEntry": true,
     "name": "app",
@@ -29,10 +29,13 @@
     "src": "resources/fonts/Sarabun-SemiBold.woff2"
   },
   "resources/js/app.js": {
-    "file": "assets/app-CWWyqwRy.js",
+    "file": "assets/app-BTf5Hnin.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true,
+    "imports": [
+      "resources/js/limited-textarea.js"
+    ],
     "css": [
       "assets/app-B26ENHr1.css"
     ]
@@ -41,6 +44,12 @@
     "file": "assets/home-C2cPyg_k.js",
     "name": "home",
     "src": "resources/js/home.js",
+    "isEntry": true
+  },
+  "resources/js/limited-textarea.js": {
+    "file": "assets/limited-textarea-Cf1qKPcM.js",
+    "name": "limited-textarea",
+    "src": "resources/js/limited-textarea.js",
     "isEntry": true
   }
 }

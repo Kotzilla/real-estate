@@ -25,6 +25,8 @@ return [
         'contract-create' => 'Added contract',
         'contract-update' => 'Edited contract',
         'contract-print' => 'Printed contract',
+        'enquiry-update' => 'Changed enquiry status',
+        'comment-create' => 'Added note',
         'user-invite' => 'Invited user',
         'user-update' => 'Edited user',
         'user-archive' => 'Archived user',

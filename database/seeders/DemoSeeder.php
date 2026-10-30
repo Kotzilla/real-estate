@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Enums\ContractStatus;
+use App\Enums\EnquiryStatus;
 use App\Enums\PropertyType;
 use App\Models\Contract;
 use App\Models\District;
@@ -19,13 +20,41 @@ use Throwable;
  * Demo Seeder
  *
  * Mock listings around Koh Phangan (the island the site covers), each at a real beach or village with a photo, plus
- * owners, customers and two contracts, to click through in development. Never run in production (DatabaseSeeder).
+ * owners, customers, two contracts, four staff (a manager and three agents, all `letmein`) and visitors' enquiries
+ * with follow-up notes, to click through in development. Never run in production (DatabaseSeeder).
  *
  * @SuppressWarnings(PHPMD.StaticAccess)
  * @package Database\Seeders
  */
 class DemoSeeder extends Seeder
 {
+    // Staff: name, username, phone, role
+    public const STAFF = [
+        ['Napat Srisuk', 'napat', '0812345678', 'agent'],
+        ['Siriporn Chaiyo', 'siriporn', '0823456789', 'manager'],
+        ['Kittipong Wongsa', 'kittipong', '0834567890', 'agent'],
+        ['Malee Thongdee', 'malee', '0845678901', 'agent'],
+    ];
+
+    // Enquiries: name, phone, message, status, days ago, staff notes (oldest first)
+    public const ENQUIRIES = [
+        ['Anna Schmidt', '+491701234567', 'Could I see it this Saturday morning?', EnquiryStatus::Open, 0, []],
+        ['Tom Baker', '+447700900123', null, EnquiryStatus::Open, 1, []],
+        ['Somchai Rattana', '0861234567', 'สนใจเช่าระยะยาว 1 ปี ขอนัดดูวันอาทิตย์ครับ', EnquiryStatus::Open, 2, []],
+        ['Julia Rossi', '+393331234567', 'Is the price negotiable for a 2-year lease?', EnquiryStatus::InProgress, 3,
+            ['Called, she wants to see it Friday 10:00.', 'Owner says 5% off for 2 years. Sent her the offer on WhatsApp.']],
+        ['Mark Jensen', '+4520123456', 'Looking to buy before December.', EnquiryStatus::InProgress, 5,
+            ['No answer, left a voicemail.']],
+        ['Lena Müller', '+4915112345678', 'Pets allowed? We have a small dog.', EnquiryStatus::InProgress, 6,
+            ['Called back, dog is fine with the owner. Viewing on Tuesday.']],
+        ['Pim Saetang', '0897654321', null, EnquiryStatus::Closed, 9,
+            ['Called, viewing done.', 'Signed the lease, see the contract.']],
+        ['David Cohen', '+972501234567', 'Can I visit with my family next week?', EnquiryStatus::Closed, 12,
+            ['Visited Monday, found the house too far from the beach. Closed.']],
+        ['Sophie Martin', '+33612345678', 'Wrong number? Just checking availability.', EnquiryStatus::Closed, 15,
+            ['Already rented elsewhere, not interested any more.']],
+    ];
+
     // Areas of the island: name => [lat, lng], each a little inland of its beach so the pins sit on land
     public const AREAS = [
         'Thong Sala' => [9.7155, 100.0170],
@@ -94,20 +123,23 @@ class DemoSeeder extends Seeder
      */
     public function run(): void
     {
-        $agent = User::create(['name' => 'Napat Srisuk', 'username' => 'napat', 'email' => 'napat@example.com', 'phone' => '0812345678', 'password' => 'letmein']);
-        $agent->assignRole('agent');
+        // Staff besides the admin (DatabaseSeeder): sign in with the username and `letmein`
+        $staff = collect(self::STAFF)->map(fn (array $row) => User::create([
+            'name' => $row[0], 'username' => $row[1], 'email' => $row[1].'@example.com', 'phone' => $row[2], 'password' => 'letmein',
+        ])->assignRole($row[3]));
+        $agents = $staff->filter(fn (User $user) => $user->hasRole('agent'))->values();
 
         $district = District::query()->where('code', Property::HOME_DISTRICT)->firstOrFail();
         $owners = Person::factory()->owner()->count(5)->create();
         $customers = Person::factory()->count(4)->create();
 
-        $properties = collect(self::LISTINGS)->map(function (array $row, int $i) use ($owners, $agent, $district) {
+        $properties = collect(self::LISTINGS)->map(function (array $row, int $i) use ($owners, $agents, $district) {
             [$area, $type, $name, $bedrooms, $sale, $rent, $areaM2, $land, $facilities] = $row;
             [$lat, $lng] = self::AREAS[$area];
 
             $property = Property::factory()->create([
                 'owner_id' => $owners[$i % $owners->count()]->id,
-                'user_id' => $agent->id,
+                'user_id' => $agents[$i % $agents->count()]->id,
                 'province_id' => $district->province_id,
                 'district_id' => $district->id,
                 'type' => $type,
@@ -134,31 +166,57 @@ class DemoSeeder extends Seeder
             return $property;
         });
 
-        $this->randomListings($owners, $agent, $district, $properties->count());
+        $this->randomListings($owners, $agents, $district, $properties->count());
 
         // A signed lease on the Ban Tai studio, a sale being prepared on the Sunset villa
         Contract::factory()->create([
-            'property_id' => $properties[14]->id, 'customer_id' => $customers[0]->id, 'user_id' => $agent->id,
+            'property_id' => $properties[14]->id, 'customer_id' => $customers[0]->id, 'user_id' => $properties[14]->user_id,
             'price' => 22000, 'deposit' => 44000, 'advance' => 22000, 'commission_percent' => 8.33,
             'status' => ContractStatus::Active, 'signed_on' => now()->subMonths(10), 'start_on' => now()->subMonths(10)->startOfMonth(),
             'end_on' => now()->addMonths(2)->startOfMonth()->subDay(),
         ]);
         Contract::factory()->sale()->create([
-            'property_id' => $properties[2]->id, 'customer_id' => $customers[1]->id, 'user_id' => $agent->id,
+            'property_id' => $properties[2]->id, 'customer_id' => $customers[1]->id, 'user_id' => $properties[2]->user_id,
             'price' => $properties[2]->sale_price, 'deposit' => 1000000,
         ]);
+
+        $this->enquiries($properties, $staff);
+    }
+
+    /**
+     * Visitors' viewing requests in every status, the ones being followed up with staff notes
+     *
+     * @param  Collection  $properties
+     * @param  Collection  $staff
+     * @return void
+     */
+    protected function enquiries(Collection $properties, Collection $staff): void
+    {
+        foreach (self::ENQUIRIES as $i => [$name, $phone, $message, $status, $daysAgo, $notes]) {
+            $at = now()->subDays($daysAgo)->setTime(9 + $i % 9, ($i * 17) % 60);
+            $enquiry = $properties[($i * 5) % $properties->count()]->enquiries()->create([
+                'name' => $name, 'phone' => $phone, 'message' => $message, 'status' => $status,
+            ]);
+            $enquiry->forceFill(['created_at' => $at, 'updated_at' => $at])->save();
+
+            foreach ($notes as $n => $body) {
+                $noteAt = $at->copy()->addHours(3 + $n * 20);
+                $comment = $enquiry->comments()->create(['user_id' => $staff[($i + $n) % $staff->count()]->id, 'body' => $body]);
+                $comment->forceFill(['created_at' => $noteAt, 'updated_at' => $noteAt])->save();
+            }
+        }
     }
 
     /**
      * Faker listings scattered over the island's areas
      *
      * @param  Collection  $owners
-     * @param  User  $agent
+     * @param  Collection  $agents
      * @param  District  $district
      * @param  int  $offset  photo seed offset, after the hand-written listings
      * @return void
      */
-    protected function randomListings(Collection $owners, User $agent, District $district, int $offset): void
+    protected function randomListings(Collection $owners, Collection $agents, District $district, int $offset): void
     {
         $views = ['Sea View', 'Sunset', 'Jungle', 'Palm', 'Coconut', 'Hillside', 'Lagoon', 'Tropical', 'Bay', 'Garden'];
         $facilities = ['Private pool', 'Shared pool', 'Sea view', 'Jungle view', 'Garden', 'Wi-Fi', 'Air conditioning', 'Parking', 'Beach access', 'Gym'];
@@ -175,7 +233,7 @@ class DemoSeeder extends Seeder
 
             $property = Property::factory()->create([
                 'owner_id' => $owners->random()->id,
-                'user_id' => $agent->id,
+                'user_id' => $agents->random()->id,
                 'province_id' => $district->province_id,
                 'district_id' => $district->id,
                 'type' => $type,
